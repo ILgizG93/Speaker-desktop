@@ -70,13 +70,12 @@ class SpeakerApplication(QMainWindow):
         self.btn_settings.setText('Настройки')
         self.btn_settings.setCursor(Qt.PointingHandCursor)
         self.btn_settings.clicked.connect(self.open_window_settings)
+        
+        self.top_layout.addWidget(self.btn_settings)
+        self.layout.addLayout(self.top_layout)
 
-        self.btn_sound_add = QPushButton()
-        self.btn_sound_add.setFixedHeight(38)
-        self.btn_sound_add.setStyleSheet('border:1px solid silver; padding:12px;')
-        self.btn_sound_add.setText('Добавить новое объявление')
-        self.btn_sound_add.setCursor(Qt.PointingHandCursor)
-        self.btn_sound_add.clicked.connect(self.open_window_sound_add)
+
+        self.table_layout = QHBoxLayout()
 
         self.btn_sound_refresh = QPushButton()
         self.btn_sound_refresh.setFixedHeight(38)
@@ -85,13 +84,20 @@ class SpeakerApplication(QMainWindow):
         self.btn_sound_refresh.setCursor(Qt.PointingHandCursor)
         self.btn_sound_refresh.clicked.connect(lambda: asyncio.run(self.get_fake_schedule_data()))
 
-        self.top_layout.addWidget(self.btn_settings)
-        self.top_layout.addWidget(self.btn_sound_add)
-        self.top_layout.addWidget(self.btn_sound_refresh)
-        self.layout.addLayout(self.top_layout)
+        self.btn_sound_create = QPushButton()
+        self.btn_sound_create.setFixedHeight(38)
+        self.btn_sound_create.setStyleSheet('border:1px solid silver; padding:12px;')
+        self.btn_sound_create.setText('Создать новое объявление')
+        self.btn_sound_create.setCursor(Qt.PointingHandCursor)
+        self.btn_sound_create.clicked.connect(self.open_window_sound_add)
 
+        self.btn_sound_append = QPushButton()
+        self.btn_sound_append.setFixedHeight(38)
+        self.btn_sound_append.setStyleSheet('border:1px solid silver; padding:12px;')
+        self.btn_sound_append.setText('Добавить объявление в очередь')
+        self.btn_sound_append.setCursor(Qt.PointingHandCursor)
+        self.btn_sound_append.clicked.connect(self.append_to_playlist)
 
-        self.table_layout = QHBoxLayout()
 
         self.current_row_id = None
         # self.main_table_model = TableModel(self, self.schedule_header, self.schedule_data)
@@ -117,11 +123,19 @@ class SpeakerApplication(QMainWindow):
         # self.main_table.setSortingEnabled(True)
 
         self.main_table.clicked.connect(self.get_current_row_id)
+        self.main_table.doubleClicked.connect(self.append_to_playlist)
+
+        self.table_layout_buttons = QVBoxLayout()
+        self.table_layout_buttons.setAlignment(Qt.AlignLeft)
+        self.table_layout_buttons.addWidget(self.btn_sound_refresh)
+        self.table_layout_buttons.addWidget(self.btn_sound_create)
+        self.table_layout_buttons.addWidget(self.btn_sound_append)
+        self.table_layout_buttons.addStretch()
 
         self.table_layout.addWidget(self.main_table)
+        self.table_layout.addLayout(self.table_layout_buttons)
 
-        self.sliders_layout = QHBoxLayout()
-        self.sliders_layout.setAlignment(Qt.AlignRight)
+        self.bottom_layout = QHBoxLayout()
 
         self.playlist = []
         self.playlist_header = ('', 'Номер рейса', 'Направление', 'Текст объявления', 'Язык', 'Продолжительность', 'Проиграть в')
@@ -146,42 +160,62 @@ class SpeakerApplication(QMainWindow):
         self.playlist_table.setSelectionMode(QAbstractItemView.SingleSelection)
         font = QFont("'Poppins', sans-serif", 11)
         self.playlist_table.setFont(font)
-        self.sliders_layout.addWidget(self.playlist_table)
+        self.bottom_layout.addWidget(self.playlist_table)
 
-        self.test_button = QPushButton()
-        self.test_button.setFixedHeight(38)
-        self.test_button.setStyleSheet('border:1px solid silver; padding:12px;')
-        self.test_button.setText('Добавить объявление в очередь')
-        self.test_button.setCursor(Qt.PointingHandCursor)
-        self.test_button.clicked.connect(self.append_to_playlist)
-        self.sliders_layout.addWidget(self.test_button)
 
-        self.test_button = QPushButton()
-        self.test_button.setFixedHeight(38)
-        self.test_button.setStyleSheet('border:1px solid silver; padding:12px;')
-        self.test_button.setText('Воспроизвести')
-        self.test_button.setCursor(Qt.PointingHandCursor)
-        self.test_button.clicked.connect(self.play_sound)
-        self.sliders_layout.addWidget(self.test_button)
+        self.bottom_buttons_layout = QVBoxLayout()
+        self.bottom_buttons_layout.setAlignment(Qt.AlignTop)
+        
+        self.btn_sound_play = QPushButton()
+        self.btn_sound_play.setFixedWidth(200)
+        self.btn_sound_play.setFixedHeight(38)
+        self.btn_sound_play.setStyleSheet('border:1px solid silver; padding:12px;')
+        self.btn_sound_play.setText('Воспроизвести')
+        self.btn_sound_play.setCursor(Qt.PointingHandCursor)
+        self.btn_sound_play.clicked.connect(self.play_sound)
+        
+        self.btn_sound_time = QPushButton()
+        self.btn_sound_time.setFixedWidth(200)
+        self.btn_sound_time.setFixedHeight(38)
+        self.btn_sound_time.setStyleSheet('border:1px solid silver; padding:12px;')
+        self.btn_sound_time.setText('Установить время')
+        self.btn_sound_time.setCursor(Qt.PointingHandCursor)
+        self.btn_sound_time.clicked.connect(self.play_sound)
+
+        self.btn_sound_delete = QPushButton()
+        self.btn_sound_delete.setFixedWidth(200)
+        self.btn_sound_delete.setFixedHeight(38)
+        self.btn_sound_delete.setStyleSheet('border:1px solid silver; padding:12px;')
+        self.btn_sound_delete.setText('Удалить')
+        self.btn_sound_delete.setCursor(Qt.PointingHandCursor)
+        self.btn_sound_delete.clicked.connect(self.delete_sound)
+
+        self.bottom_buttons_layout.addWidget(self.btn_sound_play)
+        self.bottom_buttons_layout.addWidget(self.btn_sound_time)
+        self.bottom_buttons_layout.addWidget(self.btn_sound_delete)
+        # self.bottom_buttons_layout.addStretch()
+
+        self.bottom_layout.addLayout(self.bottom_buttons_layout)
+        self.bottom_layout.addStretch()
 
 
         self.separator = QFrame()
         self.separator.setFrameShape(QFrame.VLine)
         self.separator.setLineWidth(5)
-        self.sliders_layout.addWidget(self.separator)
+        self.bottom_layout.addWidget(self.separator)
 
         from UI.DeviceVolumeLayout import DeviceVolumeLayout
         output_devices = self.settings.device.get('outputs')
         for i in range(1, len(output_devices)+1):
             current_device = output_devices.get(str(i))
-            self.sliders_layout.addLayout(DeviceVolumeLayout(interface, current_device))
+            self.bottom_layout.addLayout(DeviceVolumeLayout(interface, current_device))
 
         self.layout.addLayout(self.table_layout)
         self.separator = QFrame()
         self.separator.setFrameShape(QFrame.HLine)
         self.separator.setLineWidth(3)
         self.layout.addWidget(self.separator)
-        self.layout.addLayout(self.sliders_layout)
+        self.layout.addLayout(self.bottom_layout)
 
         self.threadpool = QThreadPool()
         self.timer = QTimer()
@@ -266,6 +300,9 @@ class SpeakerApplication(QMainWindow):
         self.playlist.pop(0)
         if self.playlist:
             self.play_sound()
+
+    def delete_sound(self) -> None:
+        pass
         
             
     def open_window_settings(self):
