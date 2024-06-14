@@ -9,9 +9,8 @@ class AudioInterface(AudioUtilities):
     def __init__(self, settings):
         super().__init__()
         
-        device_indexes = list(*(host.get('devices') for host in query_hostapis() if host.get('name') == settings.device.get('hostapi')))
-        self.system_devices = dict((dev.get('name'), dev.get('index')) for dev in query_devices() if dev.get('name').startswith(settings.device.get('name')) and dev.get('index') in device_indexes)
-        self.system_devices_id = dict((device.FriendlyName, device.id) for device in self.GetAllDevices() if isinstance(device.FriendlyName, str) and device.FriendlyName.startswith(settings.device.get('name')))
+        device_index = list(*(host.get('devices') for host in query_hostapis() if host.get('name') == settings.device.get('hostapi')))
+        self.system_device = dict((dev.get('name'), dev.get('index')) for dev in query_devices() if dev.get('name').startswith(settings.device.get('name')) and dev.get('index') in device_index)
 
     # Переопределяем метод, чтобы можно было выбирать устройство по ID. По умолчанию выбирает только все устройства.
     @staticmethod

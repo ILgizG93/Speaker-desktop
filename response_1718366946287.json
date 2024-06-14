@@ -1,0 +1,2683 @@
+[
+  {
+    "schedule_id": "18416062_1",
+    "flight_id": 18416062,
+    "aviacompany_aid": "298",
+    "aviacompany_code": "ЮТ",
+    "flight_number": "134",
+    "flight_number_full": "UT 134",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 14:16",
+    "flight_time": "14:30",
+    "status_id": "6",
+    "status": "Закрыт",
+    "terminal": "1А",
+    "registration_desks": "14, 15",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → УФА",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 14:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.118270833333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 11.752020833333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.21275,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18416062_2",
+    "flight_id": 18416062,
+    "aviacompany_aid": "298",
+    "aviacompany_code": "ЮТ",
+    "flight_number": "134",
+    "flight_number_full": "UT 134",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 14:16",
+    "flight_time": "14:30",
+    "status_id": "6",
+    "status": "Закрыт",
+    "terminal": "1А",
+    "registration_desks": "14, 15",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → УФА",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 14:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.22475,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.234333333333334,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 16.586125,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18437740_1",
+    "flight_id": 18437740,
+    "aviacompany_aid": "-1136",
+    "aviacompany_code": "УР",
+    "flight_number": "919",
+    "flight_number_full": "ZF 919",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 15:15",
+    "flight_time": "15:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "1, 2, 3",
+    "boarding_gates": "5",
+    "path": "КАЗАНЬ → ШАРМ ЭЛЬ ШЕЙХ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 14:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 10.703833333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 8.449895833333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 8.560145833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18437740_2",
+    "flight_id": 18437740,
+    "aviacompany_aid": "-1136",
+    "aviacompany_code": "УР",
+    "flight_number": "919",
+    "flight_number_full": "ZF 919",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 15:15",
+    "flight_time": "15:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "1, 2, 3",
+    "boarding_gates": "5",
+    "path": "КАЗАНЬ → ШАРМ ЭЛЬ ШЕЙХ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 14:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.962354166666668,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.615020833333332,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 13.525625,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18401591_1",
+    "flight_id": 18401591,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1277",
+    "flight_number_full": "SU 1277",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 15:30",
+    "flight_time": "15:30",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16, 17, 18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.2438125,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.6960625,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.0865,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18401591_2",
+    "flight_id": 18401591,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1277",
+    "flight_number_full": "SU 1277",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 15:30",
+    "flight_time": "15:30",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16, 17, 18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.6028125,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.342375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.416333333333334,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18426678_1",
+    "flight_id": 18426678,
+    "aviacompany_aid": "-1371",
+    "aviacompany_code": "РГ",
+    "flight_number": "298",
+    "flight_number_full": "7R 298",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 15:55",
+    "flight_time": "15:55",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "22",
+    "boarding_gates": "10",
+    "path": "КАЗАНЬ → ХАНТЫ МАНСИЙСК",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.860583333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 9.065,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 9.137520833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18426678_2",
+    "flight_id": 18426678,
+    "aviacompany_aid": "-1371",
+    "aviacompany_code": "РГ",
+    "flight_number": "298",
+    "flight_number_full": "7R 298",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 15:55",
+    "flight_time": "15:55",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "22",
+    "boarding_gates": "10",
+    "path": "КАЗАНЬ → ХАНТЫ МАНСИЙСК",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.9670625,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 13.416604166666668,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.129125,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18414071_1",
+    "flight_id": 18414071,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "2935",
+    "flight_number_full": "SU 2935",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:15",
+    "flight_time": "16:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "17, 18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → СОЧИ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:58",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.764916666666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.09575,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.692166666666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18414071_2",
+    "flight_id": 18414071,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "2935",
+    "flight_number_full": "SU 2935",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:15",
+    "flight_time": "16:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "17, 18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → СОЧИ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:58",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.123916666666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 18.742041666666665,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 20.022,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18427734_1",
+    "flight_id": 18427734,
+    "aviacompany_aid": "-1576",
+    "aviacompany_code": "ИН",
+    "flight_number": "1521",
+    "flight_number_full": "WZ 1521",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:35",
+    "flight_time": "16:35",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "23, 24",
+    "boarding_gates": "10",
+    "path": "КАЗАНЬ → НИЖНЕВАРТОВСК",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:43",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.525333333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.739604166666666,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.944916666666666,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18427734_2",
+    "flight_id": 18427734,
+    "aviacompany_aid": "-1576",
+    "aviacompany_code": "ИН",
+    "flight_number": "1521",
+    "flight_number_full": "WZ 1521",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:35",
+    "flight_time": "16:35",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "23, 24",
+    "boarding_gates": "10",
+    "path": "КАЗАНЬ → НИЖНЕВАРТОВСК",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 15:43",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.760979166666667,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.967229166666666,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.167354166666666,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18434027_1",
+    "flight_id": 18434027,
+    "aviacompany_aid": "-1158",
+    "aviacompany_code": "КЛ",
+    "flight_number": "246",
+    "flight_number_full": "N4 246",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:35",
+    "flight_time": "16:35",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "12, 13",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 16:18",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.388708333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.734520833333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.979729166666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18434027_2",
+    "flight_id": 18434027,
+    "aviacompany_aid": "-1158",
+    "aviacompany_code": "КЛ",
+    "flight_number": "246",
+    "flight_number_full": "N4 246",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:35",
+    "flight_time": "16:35",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "12, 13",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 16:18",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.67225,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.346,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.408270833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18433440_1",
+    "flight_id": 18433440,
+    "aviacompany_aid": "-1935",
+    "aviacompany_code": "ЮВ",
+    "flight_number": "649",
+    "flight_number_full": "RT 649",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:50",
+    "flight_time": "16:50",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "21",
+    "boarding_gates": "11",
+    "path": "КАЗАНЬ → САРАНСК",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 16:33",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.1358125,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 14.841125,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.386645833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18433440_2",
+    "flight_id": 18433440,
+    "aviacompany_aid": "-1935",
+    "aviacompany_code": "ЮВ",
+    "flight_number": "649",
+    "flight_number_full": "RT 649",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 16:50",
+    "flight_time": "16:50",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "21",
+    "boarding_gates": "11",
+    "path": "КАЗАНЬ → САРАНСК",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 16:33",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.242291666666667,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 18.36670833333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.7581875,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18412293_1",
+    "flight_id": 18412293,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1291",
+    "flight_number_full": "SU 1291",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 17:40",
+    "flight_time": "17:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16, 17, 18",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 17:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.0283125,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.627125,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.808583333333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18412293_2",
+    "flight_id": 18412293,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1291",
+    "flight_number_full": "SU 1291",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 17:40",
+    "flight_time": "17:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16, 17, 18",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 17:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.3873125,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.2734375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.138416666666668,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18421511_1",
+    "flight_id": 18421511,
+    "aviacompany_aid": "-1158",
+    "aviacompany_code": "КЛ",
+    "flight_number": "252",
+    "flight_number_full": "N4 252",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 18:20",
+    "flight_time": "18:20",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "14, 15",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 18:03",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.066541666666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.654333333333334,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.893395833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18421511_2",
+    "flight_id": 18421511,
+    "aviacompany_aid": "-1158",
+    "aviacompany_code": "КЛ",
+    "flight_number": "252",
+    "flight_number_full": "N4 252",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 18:20",
+    "flight_time": "18:20",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "14, 15",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 18:03",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.425541666666668,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.257104166666668,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.2246875,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18410451_1",
+    "flight_id": 18410451,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1193",
+    "flight_number_full": "SU 1193",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 18:40",
+    "flight_time": "18:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "10, 11, 17",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 18:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.008708333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.380416666666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.819458333333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18410451_2",
+    "flight_id": 18410451,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1193",
+    "flight_number_full": "SU 1193",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 18:40",
+    "flight_time": "18:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "10, 11, 17",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 18:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.29225,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.0354375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.246541666666666,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18403624_1",
+    "flight_id": 18403624,
+    "aviacompany_aid": "-1824",
+    "aviacompany_code": "РД",
+    "flight_number": "297",
+    "flight_number_full": "IO 297",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 19:40",
+    "flight_time": "19:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "3, 4",
+    "boarding_gates": "2",
+    "path": "КАЗАНЬ → БАКУ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.219270833333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 14.304395833333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.802020833333334,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18403624_2",
+    "flight_id": 18403624,
+    "aviacompany_aid": "-1824",
+    "aviacompany_code": "РД",
+    "flight_number": "297",
+    "flight_number_full": "IO 297",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 19:40",
+    "flight_time": "19:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "3, 4",
+    "boarding_gates": "2",
+    "path": "КАЗАНЬ → БАКУ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.3946875,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 17.70625,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.022645833333332,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18432517_1",
+    "flight_id": 18432517,
+    "aviacompany_aid": "-1935",
+    "aviacompany_code": "ЮВ",
+    "flight_number": "505",
+    "flight_number_full": "RT 505",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 19:50",
+    "flight_time": "19:50",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "23",
+    "boarding_gates": "11",
+    "path": "КАЗАНЬ → МОСКВА ВНУКОВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:33",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.087416666666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 13.904833333333332,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 13.941083333333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18432517_2",
+    "flight_id": 18432517,
+    "aviacompany_aid": "-1935",
+    "aviacompany_code": "ЮВ",
+    "flight_number": "505",
+    "flight_number_full": "RT 505",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 19:50",
+    "flight_time": "19:50",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "23",
+    "boarding_gates": "11",
+    "path": "КАЗАНЬ → МОСКВА ВНУКОВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:33",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.459479166666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 17.636541666666666,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 18.269125,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18428159_1",
+    "flight_id": 18428159,
+    "aviacompany_aid": "-1576",
+    "aviacompany_code": "ИН",
+    "flight_number": "1070",
+    "flight_number_full": "WZ 1070",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:05",
+    "flight_time": "20:05",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "24, 25",
+    "boarding_gates": "10",
+    "path": "КАЗАНЬ → ЕКАТЕРИНБУРГ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:48",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.315833333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 11.299729166666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 11.240166666666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18428159_2",
+    "flight_id": 18428159,
+    "aviacompany_aid": "-1576",
+    "aviacompany_code": "ИН",
+    "flight_number": "1070",
+    "flight_number_full": "WZ 1070",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:05",
+    "flight_time": "20:05",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "24, 25",
+    "boarding_gates": "10",
+    "path": "КАЗАНЬ → ЕКАТЕРИНБУРГ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:48",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.536979166666667,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 14.876375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.410166666666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18414892_1",
+    "flight_id": 18414892,
+    "aviacompany_aid": "-1597",
+    "aviacompany_code": "ТИ",
+    "flight_number": "928",
+    "flight_number_full": "Y7 928",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:15",
+    "flight_time": "20:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16, 17",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → ПЕРМЬ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:58",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.158458333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.270125,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.569041666666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18414892_2",
+    "flight_id": 18414892,
+    "aviacompany_aid": "-1597",
+    "aviacompany_code": "ТИ",
+    "flight_number": "928",
+    "flight_number_full": "Y7 928",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:15",
+    "flight_time": "20:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16, 17",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → ПЕРМЬ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 19:58",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.264958333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.7524375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 16.942416666666666,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18414652_1",
+    "flight_id": 18414652,
+    "aviacompany_aid": "298",
+    "aviacompany_code": "ЮТ",
+    "flight_number": "210",
+    "flight_number_full": "UT 210",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:25",
+    "flight_time": "20:25",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "20",
+    "boarding_gates": "3",
+    "path": "КАЗАНЬ → ТЮМЕНЬ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:08",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 11.230895833333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 11.316875,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 11.443020833333334,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18414652_2",
+    "flight_id": 18414652,
+    "aviacompany_aid": "298",
+    "aviacompany_code": "ЮТ",
+    "flight_number": "210",
+    "flight_number_full": "UT 210",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:25",
+    "flight_time": "20:25",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "20",
+    "boarding_gates": "3",
+    "path": "КАЗАНЬ → ТЮМЕНЬ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:08",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 14.466541666666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 14.5445,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.665208333333334,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18433518_1",
+    "flight_id": 18433518,
+    "aviacompany_aid": "-1935",
+    "aviacompany_code": "ЮВ",
+    "flight_number": "519",
+    "flight_number_full": "RT 519",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:30",
+    "flight_time": "20:30",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "24",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → КИРОВ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 11.843354166666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 14.0054375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.651145833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18433518_2",
+    "flight_id": 18433518,
+    "aviacompany_aid": "-1935",
+    "aviacompany_code": "ЮВ",
+    "flight_number": "519",
+    "flight_number_full": "RT 519",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:30",
+    "flight_time": "20:30",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "24",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → КИРОВ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 14.949833333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 17.531,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.0226875,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18435825_1",
+    "flight_id": 18435825,
+    "aviacompany_aid": "-1153",
+    "aviacompany_code": "ДР",
+    "flight_number": "6844",
+    "flight_number_full": "DP 6844",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:35",
+    "flight_time": "20:35",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "26, 27",
+    "boarding_gates": "11",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:18",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.102333333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 13.560333333333332,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.745458333333334,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18435825_2",
+    "flight_id": 18435825,
+    "aviacompany_aid": "-1153",
+    "aviacompany_code": "ДР",
+    "flight_number": "6844",
+    "flight_number_full": "DP 6844",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:35",
+    "flight_time": "20:35",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "26, 27",
+    "boarding_gates": "11",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:18",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.474395833333332,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 17.248708333333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.075291666666665,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18421163_1",
+    "flight_id": 18421163,
+    "aviacompany_aid": "-1158",
+    "aviacompany_code": "КЛ",
+    "flight_number": "248",
+    "flight_number_full": "N4 248",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:40",
+    "flight_time": "20:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "12, 13",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.267541666666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.821604166666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 13.094395833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18421163_2",
+    "flight_id": 18421163,
+    "aviacompany_aid": "-1158",
+    "aviacompany_code": "КЛ",
+    "flight_number": "248",
+    "flight_number_full": "N4 248",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:40",
+    "flight_time": "20:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "12, 13",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.551083333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.4330625,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.522916666666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18413608_1",
+    "flight_id": 18413608,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1285",
+    "flight_number_full": "SU 1285",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:45",
+    "flight_time": "20:45",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "17, 18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:28",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.8665,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.644541666666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.0770625,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18413608_2",
+    "flight_id": 18413608,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1285",
+    "flight_number_full": "SU 1285",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:45",
+    "flight_time": "20:45",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "17, 18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:28",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.2255,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.290854166666666,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.406895833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18423031_1",
+    "flight_id": 18423031,
+    "aviacompany_aid": "316",
+    "aviacompany_code": "5Н",
+    "flight_number": "848",
+    "flight_number_full": "5N 848",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:55",
+    "flight_time": "20:55",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "14, 15",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → СОЧИ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.321083333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.447166666666666,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.770041666666666,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18423031_2",
+    "flight_id": 18423031,
+    "aviacompany_aid": "316",
+    "aviacompany_code": "5Н",
+    "flight_number": "848",
+    "flight_number_full": "5N 848",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 20:55",
+    "flight_time": "20:55",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "14, 15",
+    "boarding_gates": "8",
+    "path": "КАЗАНЬ → СОЧИ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.604604166666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.058645833333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.1985625,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18422654_1",
+    "flight_id": 18422654,
+    "aviacompany_aid": "316",
+    "aviacompany_code": "5Н",
+    "flight_number": "538",
+    "flight_number_full": "5N 538",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:05",
+    "flight_time": "21:05",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "21, 22",
+    "boarding_gates": "3",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:48",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.3560625,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.69825,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 13.1713125,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18422654_2",
+    "flight_id": 18422654,
+    "aviacompany_aid": "316",
+    "aviacompany_code": "5Н",
+    "flight_number": "538",
+    "flight_number_full": "5N 538",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:05",
+    "flight_time": "21:05",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "21, 22",
+    "boarding_gates": "3",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 20:48",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.591708333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.925854166666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.39375,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18409187_1",
+    "flight_id": 18409187,
+    "aviacompany_aid": "421",
+    "aviacompany_code": "С7",
+    "flight_number": "1056",
+    "flight_number_full": "S7 1056",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:20",
+    "flight_time": "21:20",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "10, 11",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → МОСКВА ДОМОДЕДОВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:03",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.8309375,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.2716875,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 15.2854375,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18409187_2",
+    "flight_id": 18409187,
+    "aviacompany_aid": "421",
+    "aviacompany_code": "С7",
+    "flight_number": "1056",
+    "flight_number_full": "S7 1056",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:20",
+    "flight_time": "21:20",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "10, 11",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → МОСКВА ДОМОДЕДОВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:03",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.937416666666667,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.797270833333332,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.656979166666666,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18409187_101",
+    "flight_id": 18409187,
+    "aviacompany_aid": "421",
+    "aviacompany_code": "С7",
+    "flight_number": "1056",
+    "flight_number_full": "S7 1056",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:20",
+    "flight_time": "21:20",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "10, 11",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → МОСКВА ДОМОДЕДОВО",
+    "audio_text_id": 101,
+    "audio_text": "Подготовка к посадке",
+    "audio_text_description": "S7",
+    "plan_play_datetime": "2024-06-14 21:03",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 20.415958333333332,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 27.089208333333332,
+        "display": true
+      },
+      "TAT": {
+        "display": false
+      }
+    }
+  },
+  {
+    "schedule_id": "18410855_1",
+    "flight_id": 18410855,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1195",
+    "flight_number_full": "SU 1195",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:55",
+    "flight_time": "21:55",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.063875,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.448625,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.944270833333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18410855_2",
+    "flight_id": 18410855,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1195",
+    "flight_number_full": "SU 1195",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 21:55",
+    "flight_time": "21:55",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:38",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.422875,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.0949375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.274125,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18424271_1",
+    "flight_id": 18424271,
+    "aviacompany_aid": "-1153",
+    "aviacompany_code": "ДР",
+    "flight_number": "6842",
+    "flight_number_full": "DP 6842",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:10",
+    "flight_time": "22:10",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "24, 25",
+    "boarding_gates": "10, 11",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:53",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.17125,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 13.436604166666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.594520833333334,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18424271_2",
+    "flight_id": 18424271,
+    "aviacompany_aid": "-1153",
+    "aviacompany_code": "ДР",
+    "flight_number": "6842",
+    "flight_number_full": "DP 6842",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:10",
+    "flight_time": "22:10",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1",
+    "registration_desks": "24, 25",
+    "boarding_gates": "10, 11",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:53",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.39239583333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 17.01325,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 16.76460416666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18423268_1",
+    "flight_id": 18423268,
+    "aviacompany_aid": "195",
+    "aviacompany_code": "FV",
+    "flight_number": "6600",
+    "flight_number_full": "FV 6600",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:15",
+    "flight_time": "22:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:58",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.544333333333332,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 12.1266875,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.392208333333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18423268_2",
+    "flight_id": 18423268,
+    "aviacompany_aid": "195",
+    "aviacompany_code": "FV",
+    "flight_number": "6600",
+    "flight_number_full": "FV 6600",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:15",
+    "flight_time": "22:15",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "16",
+    "boarding_gates": "4",
+    "path": "КАЗАНЬ → САНКТ-ПЕТЕРБУРГ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 21:58",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 15.650833333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.609,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 16.765583333333332,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18429654_1",
+    "flight_id": 18429654,
+    "aviacompany_aid": "-1576",
+    "aviacompany_code": "ИН",
+    "flight_number": "1511",
+    "flight_number_full": "WZ 1511",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:25",
+    "flight_time": "22:25",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "6",
+    "boarding_gates": "2",
+    "path": "КАЗАНЬ → ТАШКЕНТ",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:08",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 11.612916666666667,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 11.711625,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 11.785583333333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18429654_2",
+    "flight_id": 18429654,
+    "aviacompany_aid": "-1576",
+    "aviacompany_code": "ИН",
+    "flight_number": "1511",
+    "flight_number_full": "WZ 1511",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:25",
+    "flight_time": "22:25",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "6",
+    "boarding_gates": "2",
+    "path": "КАЗАНЬ → ТАШКЕНТ",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:08",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 14.788333333333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.070208333333333,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 16.008041666666667,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18427233_1",
+    "flight_id": 18427233,
+    "aviacompany_aid": "195",
+    "aviacompany_code": "FV",
+    "flight_number": "6748",
+    "flight_number_full": "FV 6748",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:30",
+    "flight_time": "22:30",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "14",
+    "boarding_gates": "3",
+    "path": "КАЗАНЬ → КРАСНОЯРСК",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 13.323270833333334,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 13.416375,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 13.6289375,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18427233_2",
+    "flight_id": 18427233,
+    "aviacompany_aid": "195",
+    "aviacompany_code": "FV",
+    "flight_number": "6748",
+    "flight_number_full": "FV 6748",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:30",
+    "flight_time": "22:30",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "14",
+    "boarding_gates": "3",
+    "path": "КАЗАНЬ → КРАСНОЯРСК",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:13",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.558916666666665,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.644,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 17.851395833333335,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18428558_1",
+    "flight_id": 18428558,
+    "aviacompany_aid": "-1153",
+    "aviacompany_code": "ДР",
+    "flight_number": "284",
+    "flight_number_full": "DP 284",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:40",
+    "flight_time": "22:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "22, 23",
+    "boarding_gates": "10, 11",
+    "path": "КАЗАНЬ → МОСКВА ВНУКОВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.897458333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 13.375979166666667,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 12.8085,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18428558_2",
+    "flight_id": 18428558,
+    "aviacompany_aid": "-1153",
+    "aviacompany_code": "ДР",
+    "flight_number": "284",
+    "flight_number_full": "DP 284",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 22:40",
+    "flight_time": "22:40",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "22, 23",
+    "boarding_gates": "10, 11",
+    "path": "КАЗАНЬ → МОСКВА ВНУКОВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:23",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.118583333333333,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 16.952625,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 16.978583333333333,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18413488_1",
+    "flight_id": 18413488,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1283",
+    "flight_number_full": "SU 1283",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 23:00",
+    "flight_time": "23:00",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 1,
+    "audio_text": "Начинается регистрация",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:43",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 12.811354166666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 15.576333333333332,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 14.95225,
+        "display": true
+      }
+    }
+  },
+  {
+    "schedule_id": "18413488_2",
+    "flight_id": 18413488,
+    "aviacompany_aid": "555",
+    "aviacompany_code": "СУ",
+    "flight_number": "1283",
+    "flight_number_full": "SU 1283",
+    "direction_id": "1",
+    "direction": "Вылет",
+    "plan_datetime": "2024-06-14 23:00",
+    "flight_time": "23:00",
+    "status_id": "1",
+    "status": "Планируется",
+    "terminal": "1А",
+    "registration_desks": "18, 19",
+    "boarding_gates": "9",
+    "path": "КАЗАНЬ → МОСКВА ШЕРЕМЕТЬЕВО",
+    "audio_text_id": 2,
+    "audio_text": "Посадка в самолет",
+    "audio_text_description": null,
+    "plan_play_datetime": "2024-06-14 22:43",
+    "fact_play_datetime": null,
+    "is_played": null,
+    "languages": {
+      "ENG": {
+        "text": "Английский",
+        "order": 3,
+        "duration": 16.170354166666666,
+        "display": true
+      },
+      "RUS": {
+        "text": "Русский",
+        "order": 1,
+        "duration": 19.222645833333335,
+        "display": true
+      },
+      "TAT": {
+        "text": "Татарский",
+        "order": 2,
+        "duration": 19.282104166666667,
+        "display": true
+      }
+    }
+  }
+]

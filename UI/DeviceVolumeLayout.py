@@ -16,12 +16,6 @@ class DeviceVolumeLayout(QVBoxLayout):
         self.zone_label.setLineWidth(3)
         self.addWidget(self.zone_label)
 
-        self.device_label = QLabel(device.get('name', ''))
-        self.device_label.setAlignment(Qt.AlignHCenter)
-        self.device_label.setMaximumWidth(180)
-        self.device_label.setMaximumHeight(24)
-        self.addWidget(self.device_label)
-
         self.current_volume = device.get('volume')
         self.volume_slider = QSlider(Qt.Vertical)
         self.volume_slider.setRange(0, 100)
