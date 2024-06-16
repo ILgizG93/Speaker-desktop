@@ -1,6 +1,5 @@
 import os
 import json
-from pathlib import Path
 import qdarktheme
 
 SETTINGS_FILE_NAME = 'settings.json'
