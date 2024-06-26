@@ -18,5 +18,8 @@
             "7": "Зона 7",
             "8": "Зона 8"
         }
-    }
+    },
+    "api_url": "http://localhost:8000/speaker/",
+    "file_url": "C:/PythonProjects/airport/modules/speaker/audio_files/",
+    "file_format": ".wav"
 }

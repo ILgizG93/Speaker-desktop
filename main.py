@@ -16,8 +16,8 @@ def main():
     # speaker.showMaximized()
     speaker.show()
 
-    asyncio.run(speaker.get_fake_schedule_data())
-    # asyncio.run(speaker.get_schedule_data_from_API())
+    asyncio.run(speaker.get_schedule_data_from_API())
+    asyncio.run(speaker.get_background_data_from_API())
 
     sys.exit(app.exec())
 

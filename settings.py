@@ -54,11 +54,11 @@ theme_parameters = {
     'Dark Theme': {
         'theme': 'dark',
         'qss': "QWidget { background-color: #2f2f33; } QPushButton { border-width: 0px; }",
-        'custom': { "primary": "#afafaf" } 
+        'custom': { "primary": "#58B040" } 
     },
     'Light Theme': {
         'theme': 'light',
         'qss': "QPushButton { border-width: 0px; }",
-        'custom': { "primary": "#afafaf" } 
+        'custom': { "primary": "#58B040" } 
     },
 }

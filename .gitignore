@@ -1,3 +1,5 @@
+output/
+to_exe_settings.json
 ffmpeg.exe
 ffprobe.exe
 
