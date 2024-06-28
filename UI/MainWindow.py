@@ -5,7 +5,7 @@ import sounddevice as sd
 import soundfile as sf
 from math import ceil
 
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QTableWidget, QTableWidgetItem, QAbstractItemView, QHeaderView
 from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice
 from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
@@ -17,8 +17,6 @@ from .ScheduleZoneLayout import ScheduleZoneLayout
 from .BackgroundTable import BackgroundTable
 from .BackgroundButtonLayout import BackgroundButtonLayout
 from .AudioTextDialog import AudioTextDialog
-
-current_sort = [4, Qt.SortOrder.AscendingOrder]
 
 class SpeakerException(Exception):
     def __init__(self, message, extra_info):
@@ -75,12 +73,47 @@ class SpeakerApplication(QMainWindow):
 
         self.zone_layout = ScheduleZoneLayout(self.settings)
 
+        [checkbox.clicked.connect(self.zone_checkbox_click) for checkbox in self.zone_layout.checkboxes]
+
         self.mainpulation_layout = QHBoxLayout()
         self.mainpulation_layout.addLayout(self.player_button_layout)
         self.mainpulation_layout.addLayout(self.zone_layout)
+
+        import requests
+        req = requests.get(self.settings.api_url+'get_zones')
+        self.zones = req.json()
+
+
+        self.table = QTableWidget(0, len(self.schedule_header)+len(self.zones), self)
+        self.table.setMinimumWidth(300)
+        
+        self.table.setHorizontalHeaderLabels(('', 'Номер рейса', '', 'Время рейса', 'Текст объявления', 'Маршрут', *[str(zone.get('id')) for zone in self.zones], 'Терминал', 'Выход', 'РУС', 'ТАТ', 'АНГ'))
+        self.table.setColumnHidden(0, True)
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        self.table.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
+        for i in range(0, len(self.zones)):
+            self.table.horizontalHeader().setSectionResizeMode(6+i, QHeaderView.ResizeMode.Fixed)
+            self.table.setColumnWidth(6+i, 32)
+        self.table.horizontalHeader().setSectionResizeMode(len(self.zones)+6, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(len(self.zones)+7, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(len(self.zones)+8, QHeaderView.ResizeMode.Fixed)
+        self.table.horizontalHeader().setSectionResizeMode(len(self.zones)+9, QHeaderView.ResizeMode.Fixed)
+        self.table.horizontalHeader().setSectionResizeMode(len(self.zones)+10, QHeaderView.ResizeMode.Fixed)
+        self.table.setColumnWidth(len(self.zones)+8, 32)
+        self.table.setColumnWidth(len(self.zones)+9, 32)
+        self.table.setColumnWidth(len(self.zones)+10, 32)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table.selectionModel().selectionChanged.connect(self.get_current_sound)
+
         
         self.schedule_layout.addWidget(self.schedule_label)
-        self.schedule_layout.addWidget(self.schedule_table)
+        # self.schedule_layout.addWidget(self.schedule_table)
+        self.schedule_layout.addWidget(self.table)
         self.schedule_layout.addLayout(self.mainpulation_layout)
         
         self.background_layout = QVBoxLayout()
@@ -111,6 +144,7 @@ class SpeakerApplication(QMainWindow):
         self.schedule_table.setFont(font.get_font())
         self.background_label.setFont(font.get_font(18))
         self.background_table.setFont(font.get_font())
+        self.table.setFont(font.get_font())
         
         self.timer = QTimer()
         self.timer.setInterval(self.settings.schedule_update_time)
@@ -126,20 +160,54 @@ class SpeakerApplication(QMainWindow):
 
     def refresh_schedule_table(self, data: QtNetwork.QNetworkReply):
         if data.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
-            lang_status = ('✖', '✔')
             self.schedule_data = []
             bytes_string = data.readAll()
             self.schedule_data_origin = json.loads(str(bytes_string, 'utf-8'))
             for data in self.schedule_data_origin:
-                self.schedule_data.append((data.get('schedule_id'), data.get('flight_number_full'), data.get('terminal'), data.get('direction'), data.get('plan_datetime'),
-                                data.get('path'), data.get('boarding_gates'), data.get('audio_text'),
-                                lang_status[data.get('languages').get('RUS').get('display') is True],
-                                lang_status[data.get('languages').get('TAT').get('display') is True],
-                                lang_status[data.get('languages').get('ENG').get('display') is True]))
+                self.schedule_data.append((data.get('schedule_id'), data.get('flight_number_full'), data.get('direction'), data.get('flight_time'), data.get('audio_text'),
+                                data.get('airport'), 
+                                *list(map(lambda i: True if i[0]+1 in data.get('zones') else False, enumerate(self.zones))),
+                                # *[True for i in range(0, len(self.zones)) if i in data.get('zones')], 
+                                data.get('terminal'), data.get('boarding_gates'),
+                                data.get('languages').get('RUS').get('display'),
+                                data.get('languages').get('TAT').get('display'),
+                                data.get('languages').get('ENG').get('display')))
             if (len(self.schedule_data) == 0):
                 self.schedule_data = [(None,) * len(self.schedule_header)]
-            self.schedule_table.table_model.setItems(self.schedule_data)
-            # self.schedule_table.sortByColumn(*current_sort)
+
+            if (len(self.schedule_data) == 0):
+                self.table.setRowCount(0)
+            else:
+                self.table.setRowCount(len(self.schedule_data))
+                for row_indx, data in enumerate(self.schedule_data):
+                    for col_indx, item in enumerate(data):
+                        if col_indx in [2,3, 6+len(self.zones), 6+len(self.zones)+1]:
+                            element = QTableWidgetItem(item)
+                            element.setTextAlignment(Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+                            self.table.setItem(row_indx, col_indx, element)
+                        elif col_indx in [i for i in range(6, 6+len(self.zones))]:
+                            widget = QWidget()
+                            checkbox = QCheckBox()
+                            checkbox.setChecked(item)
+                            checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
+                            layoutH = QHBoxLayout(widget)
+                            layoutH.addWidget(checkbox)
+                            layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                            layoutH.setContentsMargins(0, 0, 0, 0)
+                            self.table.setCellWidget(row_indx, col_indx, widget)
+                        elif col_indx in [i for i in range(8+len(self.zones), 8+len(self.zones)+3)] and item:
+                            widget = QWidget()
+                            checkbox = QCheckBox()
+                            checkbox.setChecked(True)
+                            checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
+                            layoutH = QHBoxLayout(widget)
+                            layoutH.addWidget(checkbox)
+                            layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                            layoutH.setContentsMargins(0, 0, 0, 0)
+                            self.table.setCellWidget(row_indx, col_indx, widget)
+                        else:
+                            self.table.setItem(row_indx, col_indx, QTableWidgetItem(item))
+
             print('Schedule data refreshed!')
             self.set_active_row()
             self.timer.start()
@@ -157,7 +225,8 @@ class SpeakerApplication(QMainWindow):
             self.schedule_table.selectRow(0)
 
     def get_current_sound(self):
-        row_id = self.schedule_table.model().index(self.schedule_table.currentIndex().row(), 0).data()
+        # row_id = self.schedule_table.model().index(self.schedule_table.currentIndex().row(), 0).data()
+        row_id = self.table.item(self.table.currentRow(), 0).text()
         self.current_flight = list(filter(lambda d: d.get('schedule_id') == row_id, self.schedule_data_origin))[0]
         self.current_sound_file = self.settings.file_url+self.current_flight.get('schedule_id')+self.settings.file_format
         self.zone_layout.current_schedule_id = self.current_flight.get('schedule_id')
@@ -233,10 +302,14 @@ class SpeakerApplication(QMainWindow):
             if (len(self.background_data) == 0):
                 self.background_data = [(None,) * 2]
             self.background_table.table_model.setItems(self.background_data)
-            # self.schedule_table.sortByColumn(*current_sort)
             print('Background data refreshed!')
 
     def open_audio_text_dialog(self):
         asyncio.run(self.audio_text_dialog.get_flights_from_API())
         asyncio.run(self.audio_text_dialog.get_audio_text_from_API())
+        self.audio_text_dialog.audio_text_info_layout.itemAt(0).widget().setText('')
         self.audio_text_dialog.exec()
+
+    def zone_checkbox_click(self):
+        self.current_flight['zones'] = self.zone_layout.get_active_zones()
+        self.zone_layout.update_zones()

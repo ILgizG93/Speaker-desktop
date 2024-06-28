@@ -8,8 +8,10 @@ from UI.MainWindow import SpeakerApplication
 from WinAPI.Device import AudioInterface
 
 def main():
-
+    
+    sys.argv += ['-platform', 'windows:darkmode=2']
     app = QApplication(sys.argv)
+    app.setStyle("fusion")
     settings = SpeakerSetting()
     interface = AudioInterface(settings)
     speaker = SpeakerApplication(settings, interface)
