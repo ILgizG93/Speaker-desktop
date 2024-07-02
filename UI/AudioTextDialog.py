@@ -91,7 +91,7 @@ class AudioTextDialog(QDialog):
                 self.flight_combobox_model.clear()
             else:
                 for flight in self.flight_data_origin:
-                    item = QStandardItem(f"{flight.get('flight_time')}      {flight.get('flight_number_full')}")
+                    item = QStandardItem(f"{flight.get('plan_flight_time')}      {flight.get('flight_number_full')}")
                     item.setData(flight)
                     self.flight_combobox_model.appendRow(item)
             print('Flight data refreshed!')
@@ -121,7 +121,7 @@ class AudioTextDialog(QDialog):
         direction_id = it.data().get('direction_id')
         current_data = list(filter(lambda d: d.get('direction_id') == direction_id, self.audio_text_data_origin))
 
-        self.flight_info_layout.itemAt(0).widget().setText(f"Время рейса: {it.data().get('flight_time')}")
+        self.flight_info_layout.itemAt(0).widget().setText(f"Время рейса: {it.data().get('plan_flight_time')}")
         self.flight_info_layout.itemAt(1).widget().setText(f"Направление: {it.data().get('direction')}")
         if direction_id == 1:
             self.flight_info_layout.itemAt(2).widget().setText(f"Маршрут: {it.data().get('airport_to')}")

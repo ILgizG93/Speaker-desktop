@@ -9,6 +9,12 @@ ROOT_DIR = 'C:/FrontEnd/Speaker (PySide6)'
 
 class SpeakerSetting():
     def __init__(self):
+        self.working_dir: str
+        self.theme: str
+        self.api_url: str
+        self.schedule_update_time: int
+        self.device: dict
+        
         if os.path.isfile(SETTINGS_FILE_NAME):
             self.load_from_json()
         else:
