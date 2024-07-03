@@ -20,9 +20,10 @@ class ScheduleButtonLayout(QGridLayout):
         self.btn_sound_delete = ScheduleButton(text='Удалить')
         self.btn_sound_play = ScheduleButton(text='Воспроизвести')
         self.btn_sound_stop = ScheduleButton(text='Остановить')
+        self.btn_sound_stop.setHidden(True)
 
         self.setAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
         self.addWidget(self.btn_sound_create, 0, 0)
         self.addWidget(self.btn_sound_delete, 1, 0)
         self.addWidget(self.btn_sound_play, 0, 1)
-        self.addWidget(self.btn_sound_stop, 1, 1)
+        self.addWidget(self.btn_sound_stop, 0, 1)

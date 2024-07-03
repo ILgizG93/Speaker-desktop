@@ -7,11 +7,11 @@ from settings import SpeakerSetting
 from UI.MainWindow import SpeakerApplication
 from WinAPI.Device import AudioInterface
 
-zones: dict
-
 def main():
     
+    # sys.argv += ['-platform', 'windows:darkmode=2']
     app = QApplication(sys.argv)
+    # app.setStyle("Fusion")
     settings = SpeakerSetting()
 
     interface = AudioInterface(settings)
@@ -19,7 +19,7 @@ def main():
     # speaker.showMaximized()
     speaker.show()
 
-    asyncio.run(speaker.schedule_table.get_schedule_data_from_API())
+    asyncio.run(speaker.schedule_table.get_scheduler_data_from_API())
     asyncio.run(speaker.get_background_data_from_API())
 
     sys.exit(app.exec())

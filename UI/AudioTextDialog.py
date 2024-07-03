@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt, Slot, QUrl
 from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
 from PySide6 import QtNetwork
 
+from settings import SpeakerSetting
 from .AudioTextTable import AudioTextTable
 from .Font import RobotoFont
 
@@ -12,13 +13,13 @@ class AudioTextDialog(QDialog):
     def __init__(self, parent, settings):
         super().__init__(parent)
 
-        self.settings = settings
+        self.settings: SpeakerSetting = settings
 
         self.setWindowTitle("Добавление объявлений")
         self.setWindowIcon(QIcon("icons/app/icon.png"))
         self.setFixedSize(1024, 700)
 
-        self.layout = QGridLayout(self)
+        self.layout: QGridLayout = QGridLayout(self)
         
         self.flight_label = QLabel("Укажите рейс")
         self.flight_combobox_model = QStandardItemModel()
@@ -112,7 +113,7 @@ class AudioTextDialog(QDialog):
                 self.audio_text_data.append((data.get('id'), data.get('name'), ', '.join(map(str, data.get('zones'))), data.get('description')))
             if (len(self.audio_text_data) == 0):
                 self.audio_text_data = [(None,) * 4]
-            # self.audio_text_table.table_model.setItems(self.audio_text_data)
+            self.audio_text_table.table_model.setItems(self.audio_text_data)
             print('Background data refreshed!')
 
     @Slot(int)

@@ -7,8 +7,8 @@ import soundfile as sf
 from math import ceil
 
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel
-from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument
+from PySide6.QtGui import QIcon, QAction
 from PySide6 import QtNetwork
 
 from settings import SpeakerSetting
@@ -32,6 +32,7 @@ class SpeakerException(Exception):
 class SpeakerApplication(QMainWindow):
     def __init__(self, settings: SpeakerSetting, interface: AudioInterface):
         super().__init__()
+        font = RobotoFont()
 
         zones_request = requests.get(settings.api_url+'get_zones')
         self.zones = zones_request.json()
@@ -52,15 +53,29 @@ class SpeakerApplication(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         
-        self.layout = QHBoxLayout(self.central_widget)
-        
-        # self.btn_settings = QPushButton()
-        # self.btn_settings.setIcon(QIcon("../resources/icons/buttons/settings.png"))
-        # self.btn_settings.setIconSize(QSize(30, 30))
-        # self.btn_settings.setStyleSheet('border:1px solid silver; padding:3px 12px;')
-        # self.btn_settings.setText('Настройки')
-        # self.btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
-        # self.btn_settings.clicked.connect(self.open_window_settings)
+        self.layout: QHBoxLayout = QHBoxLayout(self.central_widget)
+
+        menu = self.menuBar()
+        menu.setFont(font.get_font(10))
+
+        setting_action = QAction("&Настройки", self)
+        setting_action.triggered.connect(lambda: print('Настройки'))
+        setting_action.setFont(font.get_font(10))
+        menu.addAction(setting_action)
+        setting_action = QAction("&Зоны", self)
+        setting_action.triggered.connect(lambda: print('Зоны'))
+        setting_action.setFont(font.get_font(10))
+        menu.addAction(setting_action)
+        setting_action = QAction("&Объявления", self)
+        setting_action.triggered.connect(lambda: print('Объявления'))
+        setting_action.setFont(font.get_font(10))
+        menu.addAction(setting_action)
+        setting_action = QAction("&Фоновые объявления", self)
+        setting_action.triggered.connect(lambda: print('Фоновые объявления'))
+        setting_action.setFont(font.get_font(10))
+        menu.addAction(setting_action)
+
+        self.audio_text_dialog = AudioTextDialog(self, settings=self.settings)
 
         self.schedule_layout = QVBoxLayout()
         
@@ -68,23 +83,20 @@ class SpeakerApplication(QMainWindow):
         self.schedule_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.schedule_label.setText('Объявления')
 
-        self.audio_text_dialog = AudioTextDialog(self, settings=self.settings)
-        self.player_button_layout = ScheduleButtonLayout()
-        self.player_button_layout.btn_sound_create.clicked.connect(self.open_audio_text_dialog)
-        self.player_button_layout.btn_sound_play.clicked.connect(lambda: asyncio.run(self.get_sound_file()))
-        self.player_button_layout.btn_sound_stop.clicked.connect(self.stop_play)
-        # TODO
-        # self.player_button_layout.btn_sound_delete.clicked.connect(self.delete_sound)
+        self.schedule_table = ScheduleTable(self.schedule_header, self.zones, self.settings)
+        self.schedule_table.selectionModel().selectionChanged.connect(self.get_current_sound)
+
+        self.schedule_button_layout = ScheduleButtonLayout()
+        self.schedule_button_layout.btn_sound_create.clicked.connect(self.open_audio_text_dialog)
+        self.schedule_button_layout.btn_sound_play.clicked.connect(lambda: asyncio.run(self.get_sound_file()))
+        self.schedule_button_layout.btn_sound_stop.clicked.connect(self.stop_play)
+        self.schedule_button_layout.btn_sound_delete.clicked.connect(self.schedule_table.delete_schedule)
 
         self.zone_layout = ScheduleZoneLayout(self.settings, self.zones)
 
         self.mainpulation_layout = QHBoxLayout()
-        self.mainpulation_layout.addLayout(self.player_button_layout)
+        self.mainpulation_layout.addLayout(self.schedule_button_layout)
         # self.mainpulation_layout.addLayout(self.zone_layout)
-
-
-        self.schedule_table = ScheduleTable(self.schedule_header, self.zones, self.settings)
-        self.schedule_table.selectionModel().selectionChanged.connect(self.get_current_sound)
         
         self.schedule_layout.addWidget(self.schedule_label)
         self.schedule_layout.addWidget(self.schedule_table)
@@ -113,7 +125,6 @@ class SpeakerApplication(QMainWindow):
         self.layout.addLayout(self.schedule_layout)
         self.layout.addLayout(self.background_layout)
 
-        font = RobotoFont()
         self.schedule_label.setFont(font.get_font(18))
         self.background_label.setFont(font.get_font(18))
         self.background_table.setFont(font.get_font())
@@ -138,7 +149,8 @@ class SpeakerApplication(QMainWindow):
             raise SpeakerException("Ошибка воспроизведения", f"Отсутствуют данные, необходимые для воспроизведения. {check}")
 
         self.schedule_table.timer.stop()
-        self.player_button_layout.btn_sound_play.setDisabled(True)
+        self.schedule_button_layout.btn_sound_play.setHidden(True)
+        self.schedule_button_layout.btn_sound_stop.setVisible(True)
 
         url_file = QUrl(self.settings.api_url+'get_scheduler_sound')
         query = QUrlQuery()
@@ -147,8 +159,14 @@ class SpeakerApplication(QMainWindow):
         
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
-        reply = self.API_manager.get(request)
+        request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
+        body = QJsonDocument({'languages': self.schedule_table.get_current_languages()})
+        
+        reply = self.API_manager.post(request, body.toJson())
         self.API_manager.finished.connect(lambda: asyncio.run(self.save_sound_file(reply)))
+        
+        # reply = self.API_manager.get(request)
+        # self.API_manager.finished.connect(lambda: asyncio.run(self.save_sound_file(reply)))
 
     async def save_sound_file(self, data: QtNetwork.QNetworkReply):
         self.file = QSaveFile(self.current_sound_file)
@@ -175,7 +193,8 @@ class SpeakerApplication(QMainWindow):
         sd.stop()
         self.schedule_table.timer.start()
         self.play_finish_timer.stop()
-        self.player_button_layout.btn_sound_play.setEnabled(True)
+        self.schedule_button_layout.btn_sound_play.setVisible(True)
+        self.schedule_button_layout.btn_sound_stop.setHidden(True)
 
     async def get_background_data_from_API(self) -> None:
         url_file = QUrl(self.settings.api_url+'get_audio_background_text')

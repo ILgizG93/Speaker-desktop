@@ -58,9 +58,9 @@ class ScheduleTable(QTableWidget):
         
         self.timer = QTimer()
         self.timer.setInterval(self.settings.schedule_update_time)
-        self.timer.timeout.connect(lambda: asyncio.run(self.get_schedule_data_from_API()))
+        self.timer.timeout.connect(lambda: asyncio.run(self.get_scheduler_data_from_API()))
     
-    async def get_schedule_data_from_API(self) -> None:
+    async def get_scheduler_data_from_API(self) -> None:
         self.timer.stop()
         url_file = QUrl(self.settings.api_url+'get_scheduler')
         request = QtNetwork.QNetworkRequest(url_file)
@@ -91,7 +91,7 @@ class ScheduleTable(QTableWidget):
             else:
                 self.setRowCount(len(self.schedule_data))
                 for row_indx, data in enumerate(self.schedule_data):
-                    current_schedule = list(filter(lambda d: data[0] == d.get('schedule_id'), self.schedule_data_origin))[0]
+                    current_schedule: dict = list(filter(lambda d: data[0] == d.get('schedule_id'), self.schedule_data_origin))[0]
                     for col_indx, item in enumerate(data):
                         if col_indx in [2,3,4,10,11]:
                             element = QTableWidgetItem(item)
@@ -101,7 +101,8 @@ class ScheduleTable(QTableWidget):
                         elif col_indx in [i for i in range(11, 11+len(self.zones)+1)]:
                             widget = QWidget()
                             checkbox = TableCheckbox(row_indx, col_indx)
-                            checkbox.setChecked(item)
+                            if current_schedule.get('flight_type_id') in self.zones[col_indx-12].get('flight_type'):
+                                checkbox.setChecked(item)
                             checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
                             layoutH = QHBoxLayout(widget)
                             layoutH.addWidget(checkbox)
@@ -143,10 +144,9 @@ class ScheduleTable(QTableWidget):
         current_languages: list[int] = []
         row: int = self.currentRow()
         for i in range(7, 10):
-            checkbox: QCheckBox = self.cellWidget(row,i).findChild(QCheckBox)
-            if checkbox.checkState() == Qt.CheckState.Checked:
+            cell = self.cellWidget(row,i)
+            if cell and cell.findChild(QCheckBox).checkState() == Qt.CheckState.Checked:
                 current_languages.append(i-6)
-        print(current_languages)
         return current_languages
     
     def get_current_zones(self) -> list[int]:
@@ -156,22 +156,27 @@ class ScheduleTable(QTableWidget):
             checkbox: QCheckBox = self.cellWidget(row,i).findChild(QCheckBox)
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-11)
-        print(current_zones)
         return current_zones
     
-    def update_scheduler(self) -> None:
-        url_file = QUrl(self.settings.api_url+'update_scheduler')
-        query = QUrlQuery()
-        query.addQueryItem('schedule_id', self.current_schedule_id)
-        url_file.setQuery(query.query())
+    def update_schedule(self, is_delete: bool = None) -> None:
+        url_file = QUrl(self.settings.api_url+'update_schedule')
         request = QtNetwork.QNetworkRequest(url_file)
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
-        self.API_zones = QtNetwork.QNetworkAccessManager()
-        
-        body = QJsonDocument({'languages': self.get_current_languages(), 'zones': self.get_current_zones()})
-        self.API_zones.post(request, body.toJson())
+        self.API_post = QtNetwork.QNetworkAccessManager()
+        body = QJsonDocument({
+            'flight_id': self.current_flight.get('flight_id'),
+            'audio_text_id': self.current_flight.get('audio_text_id'),
+            'languages': self.get_current_languages(), 
+            'zones': self.get_current_zones(),
+            'is_deleted': is_delete
+        })
+        self.API_post.post(request, body.toJson())
+    
+    def delete_schedule(self):
+        self.removeRow(self.currentRow())
+        self.update_schedule(is_delete=True)
 
     def on_checkbox_state_change(self) -> None:
         row, column = map(int, self.sender().objectName().split('_'))
         self.selectRow(row)
-        self.update_scheduler()
+        self.update_schedule()
