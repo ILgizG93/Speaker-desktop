@@ -20,6 +20,7 @@
         }
     },
     "api_url": "http://localhost:8000/speaker/",
-    "file_url": "C:/PythonProjects/airport/modules/speaker/audio_files/",
+    "log_file_path": "loggers.json",
+    "file_url": "/audio_files/",
     "file_format": ".wav"
 }

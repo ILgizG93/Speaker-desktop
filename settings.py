@@ -4,8 +4,7 @@ import qdarktheme
 
 SETTINGS_FILE_NAME = 'settings.json'
 DEFAULT_SETTINGS_FILE_NAME = 'settings-default.json'
-# ROOT_DIR = Path(__file__).resolve().parts
-ROOT_DIR = 'C:/FrontEnd/Speaker (PySide6)'
+ROOT_DIR = os.path.abspath(os.curdir)
 
 class SpeakerSetting():
     def __init__(self):
@@ -14,6 +13,9 @@ class SpeakerSetting():
         self.api_url: str
         self.schedule_update_time: int
         self.device: dict
+        self.log_file_path: str
+        self.file_url: str
+        self.file_format: str
         
         if os.path.isfile(SETTINGS_FILE_NAME):
             self.load_from_json()
@@ -24,7 +26,6 @@ class SpeakerSetting():
                 setattr(self, setting, DEFAULT_SETTINGS[setting])
             self.save_to_json()
         self.set_working_dir(os.path.join(os.getcwd(), self.working_dir))
-        self.apply_theme(self.theme)
 
     def load_from_json(self):
         with open(SETTINGS_FILE_NAME, 'r', encoding='utf-8') as json_file:

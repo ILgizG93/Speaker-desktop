@@ -3,19 +3,15 @@ import asyncio
 
 from PySide6.QtWidgets import QApplication
 
-from settings import SpeakerSetting
 from UI.MainWindow import SpeakerApplication
-from WinAPI.Device import AudioInterface
+from globals import settings
 
 def main():
     
-    # sys.argv += ['-platform', 'windows:darkmode=2']
     app = QApplication(sys.argv)
-    # app.setStyle("Fusion")
-    settings = SpeakerSetting()
+    settings.apply_theme(settings.theme)
 
-    interface = AudioInterface(settings)
-    speaker = SpeakerApplication(settings, interface)
+    speaker = SpeakerApplication()
     # speaker.showMaximized()
     speaker.show()
 

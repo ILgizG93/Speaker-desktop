@@ -4,9 +4,11 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume, IMMDeviceEnumerato
 from pycaw.constants import CLSID_MMDeviceEnumerator
 from ctypes import cast, POINTER
 
+from settings import SpeakerSetting
+
 
 class AudioInterface(AudioUtilities):
-    def __init__(self, settings):
+    def __init__(self, settings: SpeakerSetting):
         super().__init__()
         device_index = list(*(host.get('devices') for host in query_hostapis() if host.get('name') == settings.device.get('hostapi')))
         self.system_device = dict((dev.get('name'), dev.get('index')) for dev in query_devices() if dev.get('name').startswith(settings.device.get('name')) and dev.get('index') in device_index)

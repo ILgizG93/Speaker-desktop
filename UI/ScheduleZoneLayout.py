@@ -2,12 +2,10 @@ from PySide6.QtWidgets import QGridLayout, QLabel
 from PySide6.QtCore import Qt
 
 from .Font import RobotoFont
-from settings import SpeakerSetting
 
 class ScheduleZoneLayout(QGridLayout):
-    def __init__(self, settings: SpeakerSetting, zones: dict, parent=None) -> None:
+    def __init__(self, zones: dict, parent=None) -> None:
         super().__init__(parent)
-        self.settings = settings
         self.zones = zones
         self.current_schedule_id = None
         self.setHorizontalSpacing(25)

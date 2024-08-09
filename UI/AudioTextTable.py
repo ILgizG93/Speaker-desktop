@@ -20,3 +20,10 @@ class AudioTextTable(QTableView):
         self.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
         self.setColumnWidth(2, 180)
+
+    def get_current_row_id(self) -> str:
+        try:
+            row_id = self.model().index(self.currentIndex().row(), 0).data()
+        except AttributeError as err:
+            return None
+        return row_id

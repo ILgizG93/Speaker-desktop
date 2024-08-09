@@ -1,10 +1,11 @@
 from PySide6.QtWidgets import QVBoxLayout, QLabel, QSlider, QFrame
 from PySide6.QtCore import Qt
 
+from globals import interface
+
 class DeviceVolumeLayout(QVBoxLayout):
-    def __init__(self, interface, device: dict):
+    def __init__(self, device: dict):
         super().__init__()
-        self.interface = interface
         self.device_id = device.get('device_ID')
 
         self.zone_label = QLabel(device.get('location'))
@@ -33,6 +34,6 @@ class DeviceVolumeLayout(QVBoxLayout):
         self.addWidget(self.volume_value_label)
 
     def set_volume(self, volume):
-        self.interface.set_device_volume(self.device_id, int(volume))
+        interface.set_device_volume(self.device_id, int(volume))
         self.volume_value_label.setText(f"{int(volume)}%")
         self.current_volume = volume
