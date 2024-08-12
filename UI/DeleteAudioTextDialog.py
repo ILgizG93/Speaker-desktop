@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QGridLayout, QLabel, QDialog, QCheckBox
-from PySide6.QtCore import Qt, QUrl, QJsonDocument, Signal
+from PySide6.QtCore import Qt, QUrl, QUrlQuery, QJsonDocument, Signal
 from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
 
@@ -11,6 +11,7 @@ from .SpeakerButton import SpeakerButton
 class DeleteAudioTextDialog(QDialog):
     delete_all_audio: bool = None
     delete_signal: Signal = Signal(tuple)
+    schedule_data: dict = None
     
     def __init__(self, parent):
         super().__init__(parent)
@@ -54,17 +55,24 @@ class DeleteAudioTextDialog(QDialog):
         self.delete_audio_from_schedule()
 
     def delete_audio_from_schedule(self) -> None:
+        flight_id = self.flight.get('flight_id')
+        audio_text_id_list = []
+        if self.delete_all_audio:
+            flight_list: list = list(filter(lambda d: flight_id == d.get('flight_id'), self.schedule_data))
+            audio_text_id_list = [f.get('audio_text_id') for f in flight_list]
+        else:
+            audio_text_id_list = [self.flight.get('audio_text_id')]
+        audio_text_id_list = ','.join(map(str, audio_text_id_list))
         self.btn_message_delete.setDisabled(True)
         url_file = QUrl(settings.api_url+'delete_schedule')
+        query = QUrlQuery()
+        query.addQueryItem('flight_id', str(flight_id))
+        query.addQueryItem('audio_text_id_list', audio_text_id_list)
+        url_file.setQuery(query.query())
         request = QtNetwork.QNetworkRequest(url_file)
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         self.API_post = QtNetwork.QNetworkAccessManager()
-        body = QJsonDocument({
-            'flight_id': self.flight.get('flight_id'),
-            'audio_text_id': self.flight.get('audio_text_id'),
-            'delete_all_audio': str(self.delete_all_audio)
-        })
-        self.API_post.post(request, body.toJson())
+        self.API_post.post(request, QJsonDocument().toJson())
         self.API_post.finished.connect(self.after_delete_audio_from_schedule)
 
     def after_delete_audio_from_schedule(self, result: QtNetwork.QNetworkReply) -> None:

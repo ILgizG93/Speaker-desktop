@@ -1,7 +1,7 @@
 import json
 
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox
-from PySide6.QtCore import Qt, Slot, QUrl, QJsonDocument, Signal
+from PySide6.QtCore import Qt, Slot, QUrl, QUrlQuery, QJsonDocument, Signal
 from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
 from PySide6 import QtNetwork
 
@@ -191,14 +191,18 @@ class AudioTextDialog(QDialog):
         audio_text_id: int = self.audio_text_table.get_current_row_id()
         
         url_file = QUrl(settings.api_url+'append_audio_text_to_schedule')
-        request = QtNetwork.QNetworkRequest(url_file)
-        request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
-        self.API_post = QtNetwork.QNetworkAccessManager()
+        query = QUrlQuery()
+        query.addQueryItem('flight_id', str(flight_id))
+        query.addQueryItem('audio_text_id', str(audio_text_id))
+        url_file.setQuery(query.query())
         self.body = {
             'flight_id': flight_id,
             'audio_text_id': audio_text_id
         }
-        self.API_post.post(request, QJsonDocument(self.body).toJson())
+        request = QtNetwork.QNetworkRequest(url_file)
+        request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
+        self.API_post = QtNetwork.QNetworkAccessManager()
+        self.API_post.post(request, QJsonDocument().toJson())
         self.API_post.finished.connect(self.after_append)
 
     def after_append(self, result: QtNetwork.QNetworkReply) -> None:
@@ -206,12 +210,14 @@ class AudioTextDialog(QDialog):
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
                 response: int = json.loads(str(bytes_string, 'utf-8'))
-                if response == 409:
-                    info_message = "Объявление уже есть в списке"
-                elif response == 200:
-                    info_message = "Данные сохранены"
-                logger.info(info_message)
-                reply = (response, info_message, self.body)
+                if response == 200:
+                    info_message = "Объявление добавлено"
+                    logger.info(info_message)
+                    reply = (response, info_message, self.body)
+                else:
+                    error_message = "Ошибка при добавлении объявления"
+                    logger.error(error_message)
+                    reply = (response, error_message, self.body)
 
             case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
                 error_message = f"Данные не сохранены. Ошибка подключения к API: {result.errorString()}"

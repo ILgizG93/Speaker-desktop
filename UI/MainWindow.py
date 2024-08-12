@@ -184,7 +184,8 @@ class SpeakerApplication(QMainWindow):
 
         url_file = QUrl(settings.api_url+'get_scheduler_sound')
         query = QUrlQuery()
-        query.addQueryItem('schedule_id', self.schedule_table.current_flight.get('schedule_id'))
+        query.addQueryItem('flight_id', self.schedule_table.current_flight.get('flight_id'))
+        query.addQueryItem('audio_text_id', self.schedule_table.current_flight.get('audio_text_id'))
         url_file.setQuery(query.query())
         
         request = QtNetwork.QNetworkRequest(url_file)
@@ -305,7 +306,7 @@ class SpeakerApplication(QMainWindow):
     def schedule_table_after_append(self, reply: tuple = None):
         if reply:
             reply_code, reply_message, reply_body = reply
-            if reply_code in (200, 409):
+            if reply_code in (200):
                 self.schedule_table.current_schedule_id = '_'.join(map(str, reply_body.values()))
                 asyncio.run(self.schedule_table.get_scheduler_data_from_API())
             self.open_message_dialog(reply_message)
@@ -316,6 +317,7 @@ class SpeakerApplication(QMainWindow):
         self.schedule_table.current_flight = self.schedule_table.get_current_flight(self.schedule_table.get_current_row_id())
         self.delete_audio_text_dialog = DeleteAudioTextDialog(self)
         self.delete_audio_text_dialog.delete_flight_checkbox.setChecked(False)
+        self.delete_audio_text_dialog.schedule_data = self.schedule_table.schedule_data_origin
         self.delete_audio_text_dialog.set_message_text(self.schedule_table.current_flight)
         self.delete_audio_text_dialog.set_flight(self.schedule_table.current_flight)
         self.delete_audio_text_dialog.delete_signal.connect(self.schedule_table_after_delete)
