@@ -99,7 +99,7 @@ class SpeakerApplication(QMainWindow):
         self.schedule_label.setText('Объявления')
 
         self.schedule_table = ScheduleTable(self.schedule_header, self.zones)
-        # self.schedule_table.selectionModel().selectionChanged.connect(self.get_current_sound)
+        self.schedule_table.selectionModel().selectionChanged.connect(self.schedule_table.set_active_schedule_id)
 
         self.schedule_button_layout = ScheduleButtonLayout()
         self.schedule_button_layout.btn_sound_create.clicked.connect(self.open_audio_text_dialog)

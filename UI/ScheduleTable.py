@@ -19,6 +19,10 @@ class TableCheckbox(QCheckBox):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 class ScheduleTable(QTableWidget):
+    schedule_data_origin: dict = {}
+    current_schedule_id: str = None
+    current_flight: dict = {}
+
     def __init__(self, header: tuple[str], zones: dict, parent=None) -> None:
         self.header: tuple[str] = header
         self.zones: dict = zones
@@ -27,9 +31,6 @@ class ScheduleTable(QTableWidget):
         super().__init__(self.row_count, self.col_count, parent)
 
         self.font: RobotoFont = RobotoFont()
-        self.current_schedule_id: str = None
-        self.current_flight: dict = {}
-
         self.speaker_status_bar = QStatusBar()
 
         self.setMinimumWidth(300)
@@ -134,7 +135,7 @@ class ScheduleTable(QTableWidget):
                             self.removeRow(0)
                 info_message = "Данные обновлены"
                 self.speaker_status_bar.setStatusBarText(text=info_message)
-                self.current_flight = self.get_current_flight(self.get_current_row_id())
+                # self.current_flight = self.get_current_flight(self.get_current_row_id())
                 self.set_active_row()
 
             case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
@@ -156,17 +157,23 @@ class ScheduleTable(QTableWidget):
             return current_flight[0]
         elif self.schedule_data_origin:
             return self.schedule_data_origin[0]
+    
+    def set_active_schedule_id(self) -> None:
+        current_flight = self.get_current_flight(self.get_current_row_id())
+        if current_flight:
+            self.current_schedule_id = current_flight.get('schedule_id')
 
     def set_active_row(self) -> None:
         if self.current_flight and self.current_flight.get('schedule_id'):
             if self.current_schedule_id is None:
-                self.current_schedule_id = self.current_flight.get('schedule_id')
-            for row in range(self.model().rowCount()):
-                index = self.model().index(row, 0)
-                if index.data() == self.current_schedule_id:
-                    self.setCurrentIndex(index)
-                    return
-            self.selectRow(0)
+                self.set_active_schedule_id()
+                self.selectRow(0)
+            else:
+                for row in range(self.model().rowCount()):
+                    index = self.model().index(row, 0)
+                    if index.data() == self.current_schedule_id:
+                        self.setCurrentIndex(index)
+                        return
         else:
             if self.schedule_data_origin:
                 self.current_flight = self.schedule_data_origin[0]
@@ -204,6 +211,7 @@ class ScheduleTable(QTableWidget):
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         self.API_post = QtNetwork.QNetworkAccessManager()
         body = QJsonDocument({
+            'id': self.current_flight.get('id'),
             'flight_id': self.current_flight.get('flight_id'),
             'audio_text_id': self.current_flight.get('audio_text_id'),
             'languages': self.get_current_languages(), 
