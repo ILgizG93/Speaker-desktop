@@ -184,8 +184,8 @@ class SpeakerApplication(QMainWindow):
 
         url_file = QUrl(settings.api_url+'get_scheduler_sound')
         query = QUrlQuery()
-        query.addQueryItem('flight_id', self.schedule_table.current_flight.get('flight_id'))
-        query.addQueryItem('audio_text_id', self.schedule_table.current_flight.get('audio_text_id'))
+        query.addQueryItem('flight_id', str(self.schedule_table.current_flight.get('flight_id')))
+        query.addQueryItem('audio_text_id', str(self.schedule_table.current_flight.get('audio_text_id')))
         url_file.setQuery(query.query())
         
         request = QtNetwork.QNetworkRequest(url_file)
@@ -215,21 +215,19 @@ class SpeakerApplication(QMainWindow):
     def save_action_history(self, user_uuid: str, action: str) -> None:
         url_file = QUrl(settings.api_url+'save_action_history')
         query = QUrlQuery()
-        query.addQueryItem('user_uuid', user_uuid)
-        query.addQueryItem('flight_id', str(self.schedule_table.current_flight.get('flight_id')))
-        query.addQueryItem('audio_text_id', str(self.schedule_table.current_flight.get('audio_text_id')))
-        query.addQueryItem('languages', ','.join(map(str, self.schedule_table.get_current_languages())))
-        query.addQueryItem('zones', ','.join(map(str, self.schedule_table.get_current_zones())))
-        query.addQueryItem('action_datetime', str(datetime.now(UTC).replace(tzinfo=None)))
-        query.addQueryItem('action', action)
         url_file.setQuery(query.query())
-        
+        body = QJsonDocument({
+            'user_id': user_uuid,
+            'flight_id': self.schedule_table.current_flight.get('flight_id'),
+            'audio_text_id': self.schedule_table.current_flight.get('audio_text_id'),
+            'languages': ','.join(map(str, self.schedule_table.get_current_languages())),
+            'zones': ','.join(map(str, self.schedule_table.get_current_zones())),
+            'action': action
+        })
         request = QtNetwork.QNetworkRequest(url_file)
-        self.API_history = QtNetwork.QNetworkAccessManager()
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
-        body = QJsonDocument({'languages': 1})
-        
-        reply = self.API_history.post(request, body.toJson())
+        self.API_history = QtNetwork.QNetworkAccessManager()
+        self.API_history.post(request, body.toJson())
 
     def play_sound(self) -> None:
         self.schedule_table.setDisabled(True)
@@ -306,7 +304,7 @@ class SpeakerApplication(QMainWindow):
     def schedule_table_after_append(self, reply: tuple = None):
         if reply:
             reply_code, reply_message, reply_body = reply
-            if reply_code in (200):
+            if reply_code in [200]:
                 self.schedule_table.current_schedule_id = '_'.join(map(str, reply_body.values()))
                 asyncio.run(self.schedule_table.get_scheduler_data_from_API())
             self.open_message_dialog(reply_message)
