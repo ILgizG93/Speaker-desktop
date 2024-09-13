@@ -10,7 +10,7 @@ from typing import Optional
 
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel
 from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument
-from PySide6.QtGui import QIcon, QAction, QFont
+from PySide6.QtGui import QIcon, QAction
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, interface, logger, exit_program_bcs_err
@@ -47,7 +47,7 @@ class SpeakerApplication(QMainWindow):
             self.open_message_dialog(error_message)
             exit_program_bcs_err()
         else:
-            self.zones = zones_request.json()
+            self.zones: list[dict] = zones_request.json()
 
 
         self.play_finish_timer = QTimer()
@@ -59,9 +59,6 @@ class SpeakerApplication(QMainWindow):
             exit_program_bcs_err()
 
         self.samplerate = settings.device.get('samplerate')
-
-        self.schedule_header = ('', 'Номер рейса', '', 'Время (План)', 'Время (Расч.)', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones])
-        self.schedule_data = [(None,) * len(self.schedule_header)]
 
         self.setWindowTitle("Speaker 2.0")
         self.setWindowIcon(QIcon("../resources/icons/app/icon.png"))
@@ -92,6 +89,9 @@ class SpeakerApplication(QMainWindow):
         setting_action.setFont(font.get_font(10))
         menu.addAction(setting_action)
 
+        self.schedule_header = ('', 'Номер рейса', '', 'Время (План)', 'Время (Расч.)', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones])
+        self.schedule_data = [(None,) * len(self.schedule_header)]
+
         self.schedule_layout = QVBoxLayout()
         
         self.schedule_label = QLabel()
@@ -120,6 +120,9 @@ class SpeakerApplication(QMainWindow):
         self.schedule_layout.addWidget(self.schedule_table)
         self.schedule_layout.addLayout(self.mainpulation_layout)
         
+        self.background_header = ('', 'Название', 'РУС', 'ТАТ', 'АНГ', *[str(zone.get('id')) for zone in self.zones])
+        self.background_data = [(None,) * len(self.schedule_header)]
+
         self.background_layout = QVBoxLayout()
         
         self.background_label = QLabel()
@@ -127,7 +130,7 @@ class SpeakerApplication(QMainWindow):
         self.background_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.background_label.setText('Фоновые объявления')
         
-        self.background_table = BackgroundTable()
+        self.background_table = BackgroundTable(self.background_header, self.zones)
 
         self.bg_button_layout = BackgroundButtonLayout()
         # TODO
@@ -264,31 +267,6 @@ class SpeakerApplication(QMainWindow):
         self.schedule_button_layout.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, action='Ручная остановка воспроизведения')
-
-    async def get_background_data_from_API(self) -> None:
-        url_file = QUrl(settings.api_url+'get_audio_background_text')
-        request = QtNetwork.QNetworkRequest(url_file)
-        self.API_bg_manager = QtNetwork.QNetworkAccessManager()
-        self.API_bg_manager.get(request)
-        self.API_bg_manager.finished.connect(self.refresh_background_table)
-
-    def refresh_background_table(self, result: QtNetwork.QNetworkReply) -> None:
-        match result.error():
-            case QtNetwork.QNetworkReply.NetworkError.NoError:
-                self.background_data = []
-                bytes_string = result.readAll()
-                self.background_data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
-                for data in self.background_data_origin:
-                    self.background_data.append((data.get('desciption'), data.get('name')))
-                if (len(self.background_data) == 0):
-                    self.background_data = [(None,) * 2]
-                self.background_table.table_model.setItems(self.background_data)
-                info_message = "Фоновые объявления обновлены"
-                self.schedule_table.speaker_status_bar.setStatusBarText(text=info_message)
-       
-            case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
-                error_message = f"Фоновые объявления. Ошибка подключения к API: {result.errorString()}"
-                self.schedule_table.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
 
     def open_audio_text_dialog(self) -> None:
         self.schedule_table.timer.stop()

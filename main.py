@@ -16,7 +16,7 @@ def main():
     speaker.show()
 
     asyncio.run(speaker.schedule_table.get_scheduler_data_from_API())
-    asyncio.run(speaker.get_background_data_from_API())
+    asyncio.run(speaker.background_table.get_background_data_from_API())
 
     sys.exit(app.exec())
 

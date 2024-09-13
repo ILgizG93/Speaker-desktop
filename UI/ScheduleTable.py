@@ -6,17 +6,8 @@ from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTab
 from PySide6.QtCore import Qt, QUrl, QTimer, QJsonDocument
 from PySide6 import QtNetwork
 
-from globals import settings, logger
+from globals import settings, logger, TableCheckbox
 from .Font import RobotoFont
-
-class TableCheckbox(QCheckBox):
-    def __init__(self, row_indx, col_indx):
-        super().__init__()        
-        self.setObjectName(f'{row_indx}_{col_indx}')
-        self.setStyleSheet("QCheckBox::indicator" "{" "width :20px;" "height : 20px;" "}")
-        self.setFixedWidth(22)
-        self.setFixedHeight(32)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
 class ScheduleTable(QTableWidget):
     schedule_data_origin: dict = {}
@@ -31,7 +22,6 @@ class ScheduleTable(QTableWidget):
         super().__init__(self.row_count, self.col_count, parent)
 
         self.font: RobotoFont = RobotoFont()
-        self.speaker_status_bar = QStatusBar()
 
         self.setMinimumWidth(300)
         
@@ -112,7 +102,6 @@ class ScheduleTable(QTableWidget):
                                     elif col_indx in [i for i in range(11, 11+len(self.zones)+1)]:
                                         widget = QWidget()
                                         checkbox = TableCheckbox(row_indx, col_indx)
-                                        # if current_schedule.get('flight_type_id') in self.zones[col_indx-12].get('flight_type'):
                                         checkbox.setChecked(item)
                                         checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
                                         layoutH = QHBoxLayout(widget)

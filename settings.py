@@ -12,6 +12,7 @@ class SpeakerSetting():
         self.theme: str
         self.api_url: str
         self.schedule_update_time: int
+        self.background_schedule_update_time: int
         self.device: dict
         self.log_file_path: str
         self.file_url: str
@@ -39,6 +40,7 @@ class SpeakerSetting():
                 'working_dir': self.working_dir,
                 'theme': self.theme,
                 'schedule_update_time': self.schedule_update_time,
+                'background_schedule_update_time': self.background_schedule_update_time,
                 'device': self.device,
             }
             json.dump(data, json_file, ensure_ascii=False, indent=4)
