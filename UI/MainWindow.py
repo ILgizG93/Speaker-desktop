@@ -16,10 +16,9 @@ from PySide6 import QtNetwork
 from globals import root_directory, settings, interface, logger, exit_program_bcs_err
 from .Font import RobotoFont
 from .ScheduleTable import ScheduleTable
-from .ScheduleButtonLayout import ScheduleButtonLayout
+from .PlayerButtonLayout import PlayerButtonLayout
 from .ScheduleZoneLayout import ScheduleZoneLayout
 from .BackgroundTable import BackgroundTable
-from .BackgroundButtonLayout import BackgroundButtonLayout
 from .AudioTextDialog import AudioTextDialog
 from .DeleteAudioTextDialog import DeleteAudioTextDialog
 from .MessageDialog import MessageDialog
@@ -101,7 +100,7 @@ class SpeakerApplication(QMainWindow):
         self.schedule_table = ScheduleTable(self.schedule_header, self.zones)
         self.schedule_table.selectionModel().selectionChanged.connect(self.schedule_table.set_active_schedule_id)
 
-        self.schedule_button_layout = ScheduleButtonLayout()
+        self.schedule_button_layout = PlayerButtonLayout()
         self.schedule_button_layout.btn_sound_create.clicked.connect(self.open_audio_text_dialog)
         self.schedule_button_layout.btn_sound_play.clicked.connect(lambda: asyncio.run(self.get_sound_file()))
         self.schedule_button_layout.btn_sound_stop.clicked.connect(lambda: self.stop_play(True))
@@ -114,7 +113,6 @@ class SpeakerApplication(QMainWindow):
 
         self.mainpulation_layout = QHBoxLayout()
         self.mainpulation_layout.addLayout(self.schedule_button_layout)
-        # self.mainpulation_layout.addLayout(self.zone_layout)
         
         self.schedule_layout.addWidget(self.schedule_label)
         self.schedule_layout.addWidget(self.schedule_table)
@@ -132,16 +130,19 @@ class SpeakerApplication(QMainWindow):
         
         self.background_table = BackgroundTable(self.background_header, self.zones)
 
-        self.bg_button_layout = BackgroundButtonLayout()
+        self.background_button_layout = PlayerButtonLayout()
         # TODO
         # self.bg_button_layout.btn_sound_create.clicked.connect()
         # self.bg_button_layout.btn_sound_play.clicked.connect(lambda: asyncio.run(self.get_sound_file()))
         # self.bg_button_layout.btn_sound_stop.clicked.connect(self.stop_play)
         # self.bg_button_layout.btn_sound_delete.clicked.connect(self.delete_sound)
 
+        self.background_mainpulation_layout = QHBoxLayout()
+        self.background_mainpulation_layout.addLayout(self.background_button_layout)
+
         self.background_layout.addWidget(self.background_label)
         self.background_layout.addWidget(self.background_table)
-        self.background_layout.addLayout(self.bg_button_layout)
+        self.background_layout.addLayout(self.background_mainpulation_layout)
 
         self.layout.addLayout(self.schedule_layout)
         self.layout.addLayout(self.background_layout)

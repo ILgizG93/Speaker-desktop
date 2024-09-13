@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt
 
 from .SpeakerButton import SpeakerButton
 
-class ScheduleButtonLayout(QGridLayout):
+class PlayerButtonLayout(QGridLayout):
     def __init__(self):
         super().__init__()
         self.setSpacing(10)

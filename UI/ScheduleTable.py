@@ -10,7 +10,6 @@ from globals import settings, logger, TableCheckbox
 from .Font import RobotoFont
 
 class ScheduleTable(QTableWidget):
-    schedule_data_origin: dict = {}
     current_schedule_id: str = None
     current_flight: dict = {}
 
@@ -71,7 +70,7 @@ class ScheduleTable(QTableWidget):
                 if len(str(bytes_string, 'utf-8')) == 0:
                     self.setRowCount(0)
                 else:
-                    self.schedule_data_origin = json.loads(str(bytes_string, 'utf-8'))
+                    self.schedule_data_origin: dict = json.loads(str(bytes_string, 'utf-8'))
                     for data in self.schedule_data_origin:
                         self.schedule_data.append((
                             data.get('schedule_id'), data.get('flight_number_full'), data.get('direction'), data.get('plan_flight_time'), data.get('public_flight_time'), 
