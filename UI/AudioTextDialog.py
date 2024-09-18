@@ -226,4 +226,4 @@ class AudioTextDialog(QDialog):
         self.append_signal.emit(reply)
     
     def closeEvent(self, event):
-        self.append_signal.emit(tuple())
+        self.append_signal.emit(None)
