@@ -87,7 +87,7 @@ class SpeakerApplication(QMainWindow):
         # setting_action.setFont(font.get_font(10))
         # menu.addAction(setting_action)
 
-        self.schedule_header = ('', 'Номер рейса', '', 'Время (План)', 'Время (Расч.)', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones])
+        self.schedule_header = ('', 'Номер рейса', '', 'Время (План)', 'Время (Расч.)', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones], 'Озвучено')
         self.schedule_data = [(None,) * len(self.schedule_header)]
 
         self.schedule_layout = QVBoxLayout()
@@ -127,6 +127,7 @@ class SpeakerApplication(QMainWindow):
 
         self.background_button_layout = PlayerButtonLayout()
         # self.background_button_layout.btn_sound_create.clicked.connect(self.open_audio_text_dialog)
+        self.background_button_layout.btn_sound_create.setHidden(True)
         self.background_button_layout.btn_sound_play.clicked.connect(lambda: asyncio.run(self.start_playing(self.background_table, self.background_button_layout)))
         self.background_button_layout.btn_sound_stop.clicked.connect(lambda: self.stop_play(self.background_table, self.background_button_layout, True))
         self.background_button_layout.btn_sound_delete.clicked.connect(partial(self.open_delete_audio_text_dialog, self.background_table))
@@ -234,6 +235,7 @@ class SpeakerApplication(QMainWindow):
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action='Ручная остановка воспроизведения')
         elif table.__class__.__name__ == 'ScheduleTable':
+            table.set_mark_in_cell(table.currentRow(), table.col_count-1)
             table.set_schedule_is_played()
 
     def open_audio_text_dialog(self) -> None:
@@ -264,8 +266,14 @@ class SpeakerApplication(QMainWindow):
             case 'BackgroundTable':
                 self.delete_audio_text_dialog: DeleteBackgroundDialog = DeleteBackgroundDialog(self)
 
+        row_id = table.get_current_row_id()
+        if row_id is None:
+            error_message: str = "Ошибка удаления: Необходимо выбрать объявление"
+            logger.error(error_message)
+            self.open_message_dialog(error_message)
+            return
         table.timer.stop()
-        table.current_data = table.get_current_row_data(table.get_current_row_id())
+        table.current_data = table.get_current_row_data(row_id)
         self.delete_audio_text_dialog.data = table.data_origin
         self.delete_audio_text_dialog.set_message_text(table.current_data)
         self.delete_audio_text_dialog.set_data(table.current_data)

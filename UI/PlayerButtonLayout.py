@@ -16,6 +16,6 @@ class PlayerButtonLayout(QGridLayout):
 
         self.setAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
         self.addWidget(self.btn_sound_create, 0, 0)
-        self.addWidget(self.btn_sound_delete, 1, 0)
         self.addWidget(self.btn_sound_play, 0, 1)
         self.addWidget(self.btn_sound_stop, 0, 1)
+        self.addWidget(self.btn_sound_delete, 0, 2)

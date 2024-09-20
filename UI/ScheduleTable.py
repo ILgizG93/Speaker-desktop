@@ -4,6 +4,7 @@ import asyncio
 from typing import Optional
 from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout
 from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal
+from PySide6.QtGui import QBrush, QColor
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, logger, TableCheckbox
@@ -46,6 +47,7 @@ class ScheduleTable(QTableWidget):
         for i in range(0, len(self.zones)):
             self.horizontalHeader().setSectionResizeMode(12+i, QHeaderView.ResizeMode.Fixed)
             self.setColumnWidth(12+i, 32)
+        self.horizontalHeader().setSectionResizeMode(12+len(self.zones), QHeaderView.ResizeMode.ResizeToContents)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -68,7 +70,7 @@ class ScheduleTable(QTableWidget):
     def refresh_schedule_table(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
-                self.schedule_data = []
+                self.schedule_data: list = []
                 bytes_string = result.readAll()
                 if len(str(bytes_string, 'utf-8')) == 0:
                     self.setRowCount(0)
@@ -82,7 +84,8 @@ class ScheduleTable(QTableWidget):
                             data.get('languages').get('TAT').get('display'),
                             data.get('languages').get('ENG').get('display'), 
                             data.get('terminal'), data.get('boarding_gates'),
-                            *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones)))
+                            *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
+                            data.get('is_played')
                         ))
                     if (len(self.schedule_data) == 0):
                         self.schedule_data = [(None,) * len(self.header)]
@@ -119,6 +122,8 @@ class ScheduleTable(QTableWidget):
                                         layoutH.setAlignment(Qt.AlignmentFlag.AlignHCenter)
                                         layoutH.setContentsMargins(0, 0, 0, 15)
                                         self.setCellWidget(row_indx, col_indx, widget)
+                                    elif col_indx in [11+len(self.zones)+1] and item:
+                                        self.set_mark_in_cell(row_indx, col_indx)
                                     else:
                                         element = QTableWidgetItem(item)
                                         element.setFont(self.font.get_font())
@@ -134,6 +139,13 @@ class ScheduleTable(QTableWidget):
                 self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
 
         self.timer.start()
+
+    def set_mark_in_cell(self, row_indx: int, col_indx: int):
+        element = QTableWidgetItem('✓')
+        element.setFont(self.font.get_font(18))
+        element.setForeground(QBrush(QColor(255, 0, 0)))
+        element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setItem(row_indx, col_indx, element)
 
     def get_current_row_id(self) -> str:
         try:
@@ -154,7 +166,7 @@ class ScheduleTable(QTableWidget):
     def get_current_zones(self) -> list[int]:
         current_zones: list[int] = []
         row: int = self.currentRow()
-        for i in range(self.col_count - len(self.zones), self.col_count):
+        for i in range(self.col_count - len(self.zones)-1, self.col_count-1):
             checkbox: QCheckBox = self.cellWidget(row,i).findChild(QCheckBox)
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-11)

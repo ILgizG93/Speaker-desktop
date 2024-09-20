@@ -24,7 +24,7 @@ class BackgroundTable(QTableWidget):
         super().__init__(self.row_count, self.col_count, parent)
 
         self.font: RobotoFont = RobotoFont()
-        
+
         self.setMinimumWidth(400)
         self.setMaximumWidth(640)
 
@@ -48,7 +48,7 @@ class BackgroundTable(QTableWidget):
         self.timer = QTimer()
         self.timer.setInterval(settings.background_schedule_update_time)
         self.timer.timeout.connect(lambda: asyncio.run(self.get_background_data_from_API()))
-        
+
         from UI.SpeakerStatusBar import speaker_status_bar
         self.speaker_status_bar = speaker_status_bar
 
@@ -123,7 +123,7 @@ class BackgroundTable(QTableWidget):
         except AttributeError as err:
             return None
         return row_id
-    
+
     def get_current_languages(self) -> list[int]:
         current_languages: list[int] = []
         row: int = self.currentRow()
@@ -132,7 +132,7 @@ class BackgroundTable(QTableWidget):
             if cell and cell.findChild(QCheckBox).checkState() == Qt.CheckState.Checked:
                 current_languages.append(i-1)
         return current_languages
-    
+
     def get_current_zones(self) -> list[int]:
         current_zones: list[int] = []
         row: int = self.currentRow()
@@ -141,18 +141,22 @@ class BackgroundTable(QTableWidget):
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-4)
         return current_zones
-    
+
     def get_current_row_data(self, row_id: str) -> dict:
         current_data = list(filter(lambda d: d.get('audio_text_id') == int(row_id), self.data_origin))
         if current_data:
             return current_data[0]
         elif self.data_origin:
             return self.data_origin[0]
-    
+
     def set_active_schedule_id(self) -> None:
-        current_data = self.get_current_row_data(self.get_current_row_id())
-        if current_data:
-            self.current_audio_id = current_data.get('audio_text_id')
+        row_id = self.get_current_row_id()
+        if row_id:
+            current_data = self.get_current_row_data(row_id)
+            if current_data:
+                self.current_audio_id = current_data.get('audio_text_id')
+        else:
+            self.current_audio_id = None
 
     def set_active_row(self) -> None:
         if self.current_data and self.current_data.get('audio_text_id'):
@@ -176,7 +180,7 @@ class BackgroundTable(QTableWidget):
             error_message: str = "Ошибка воспроизведения: Необходимо выбрать объявление"
             self.error_signal.emit(error_message)
             return
-        
+
         self.current_data = self.get_current_row_data(row_id)
         self.current_sound_file = root_directory+'/'+settings.file_url+str(self.current_data.get('audio_text_id'))+settings.file_format
         self.current_audio_id = self.current_data.get('audio_text_id')
@@ -192,12 +196,12 @@ class BackgroundTable(QTableWidget):
         query = QUrlQuery()
         query.addQueryItem('audio_text_id', str(self.current_data.get('audio_text_id')))
         url_file.setQuery(query.query())
-        
+
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
         body = QJsonDocument({'languages': self.get_current_languages()})
-        
+
         reply = self.API_manager.post(request, body.toJson())
         self.API_manager.finished.connect(lambda: self.play_signal.emit(reply))
 
