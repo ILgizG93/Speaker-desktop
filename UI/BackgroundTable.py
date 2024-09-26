@@ -91,17 +91,16 @@ class BackgroundTable(QTableWidget):
                                     layoutH = QHBoxLayout(widget)
                                     layoutH.addWidget(checkbox)
                                     layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                                    layoutH.setContentsMargins(0, 0, 0, 0)
                                     self.setCellWidget(row_indx, col_indx, widget)
                                 elif col_indx in [2,3,4] and item:
                                     widget = QWidget()
-                                    checkbox = TableCheckbox(row_indx, col_indx)
-                                    checkbox.setChecked(col_indx-1 in current_schedule_background.get('languages_list'))
-                                    checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
                                     layoutH = QHBoxLayout(widget)
-                                    layoutH.addWidget(checkbox)
-                                    layoutH.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-                                    layoutH.setContentsMargins(0, 0, 0, 15)
+                                    layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                                    if item:
+                                        checkbox = TableCheckbox(row_indx, col_indx)
+                                        checkbox.setChecked(col_indx-1 in current_schedule_background.get('languages_list'))
+                                        checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
+                                        layoutH.addWidget(checkbox)
                                     self.setCellWidget(row_indx, col_indx, widget)
                                 else:
                                     element = QTableWidgetItem(item)

@@ -51,7 +51,7 @@ class ScheduleTable(QTableWidget):
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-                
+    
         self.timer = QTimer()
         self.timer.setInterval(settings.schedule_update_time)
         self.timer.timeout.connect(lambda: asyncio.run(self.get_scheduler_data_from_API()))
@@ -110,17 +110,16 @@ class ScheduleTable(QTableWidget):
                                         layoutH = QHBoxLayout(widget)
                                         layoutH.addWidget(checkbox)
                                         layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                                        layoutH.setContentsMargins(0, 0, 0, 0)
                                         self.setCellWidget(row_indx, col_indx, widget)
-                                    elif col_indx in [7,8,9] and item:
+                                    elif col_indx in [7,8,9]:
                                         widget = QWidget()
-                                        checkbox = TableCheckbox(row_indx, col_indx)
-                                        checkbox.setChecked(col_indx-6 in current_schedule.get('languages_list'))
-                                        checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
                                         layoutH = QHBoxLayout(widget)
-                                        layoutH.addWidget(checkbox)
-                                        layoutH.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-                                        layoutH.setContentsMargins(0, 0, 0, 15)
+                                        layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                                        if item:
+                                            checkbox = TableCheckbox(row_indx, col_indx)
+                                            checkbox.setChecked(col_indx-6 in current_schedule.get('languages_list'))
+                                            checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
+                                            layoutH.addWidget(checkbox)
                                         self.setCellWidget(row_indx, col_indx, widget)
                                     elif col_indx in [11+len(self.zones)+1] and item:
                                         self.set_mark_in_cell(row_indx, col_indx)
@@ -130,6 +129,7 @@ class ScheduleTable(QTableWidget):
                                         self.setItem(row_indx, col_indx, element)
                             else:
                                 self.removeRow(0)
+                            self.resizeRowToContents(row_indx)
                 info_message = "Данные обновлены"
                 self.speaker_status_bar.setStatusBarText(text=info_message)
                 self.set_active_row()
@@ -159,7 +159,7 @@ class ScheduleTable(QTableWidget):
         row: int = self.currentRow()
         for i in range(7, 10):
             cell = self.cellWidget(row,i)
-            if cell and cell.findChild(QCheckBox).checkState() == Qt.CheckState.Checked:
+            if cell.findChild(QCheckBox) and cell.findChild(QCheckBox).checkState() == Qt.CheckState.Checked:
                 current_languages.append(i-6)
         return current_languages
     
@@ -240,7 +240,7 @@ class ScheduleTable(QTableWidget):
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
-        body = QJsonDocument({'languages': self.get_current_languages()})
+        body = QJsonDocument({'languages': self.get_current_languages(), 'zones': self.get_current_zones()})
         
         reply = self.API_manager.post(request, body.toJson())
         self.API_manager.finished.connect(lambda: self.play_signal.emit(reply))

@@ -145,11 +145,7 @@ class AudioTextDialog(QDialog):
     def get_filtered_audio_text(self, data: dict):
         row: int = self.flight_combobox.currentIndex()
         flight: QStandardItem = self.flight_combobox_model.item(row)
-        if not flight.data().get('direction_id') == data.get('direction_id'):
-            return False
-        if data.get('is_unique') is None:
-            return True
-        elif flight.data().get('aviacompany_aid') == data.get('aviacompany_aid'):
+        if data.get('id') in flight.data().get('audio_text_id_list'):
             return True
 
     @Slot(int)
