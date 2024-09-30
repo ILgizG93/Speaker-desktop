@@ -245,6 +245,8 @@ class SpeakerApplication(QMainWindow):
         self.audio_text_dialog.flight_combobox_model.clear()
         asyncio.run(self.audio_text_dialog.get_flights_from_API(flight_id))
         asyncio.run(self.audio_text_dialog.get_audio_text_from_API())
+        asyncio.run(self.audio_text_dialog.get_audio_text_reasons_from_API())
+        asyncio.run(self.audio_text_dialog.get_terminal_from_API())
         self.audio_text_dialog.audio_text_info_layout.itemAt(0).widget().setText('')
         self.audio_text_dialog.append_signal.connect(self.schedule_table_after_append)
         self.audio_text_dialog.exec()
