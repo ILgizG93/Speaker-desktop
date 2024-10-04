@@ -3,6 +3,8 @@
     "theme": "Dark Theme",
     "schedule_update_time": 60000,
     "background_schedule_update_time": 300000,
+    "old_audio_days": 1,
+    "old_audio_delete_time": 7200000,
     "device": {
         "id": "",
         "samplerate": 48000,
@@ -22,6 +24,6 @@
     },
     "api_url": "http://localhost:8000/speaker/",
     "log_file_path": "loggers.json",
-    "file_url": "audio_files/",
-    "file_format": ".wav"
+    "file_url": "/audio_files/",
+    "file_format": ".mp3"
 }

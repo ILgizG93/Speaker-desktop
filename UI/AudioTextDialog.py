@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox, QTimeEdit
 from PySide6.QtCore import Qt, Slot, QUrl, QUrlQuery, QJsonDocument, Signal, QTime
@@ -128,6 +129,9 @@ class AudioTextDialog(QDialog):
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
                 self.flight_data_origin = json.loads(str(bytes_string, 'utf-8'))
+                # item = QStandardItem("Вне рейса")
+                # item.setData({'direction_id': None})
+                # self.flight_combobox_model.appendRow(item)
                 for flight in self.flight_data_origin:
                     flight: dict
                     item = QStandardItem(f"{flight.get('plan_flight_time')}     {flight.get('flight_number_full')}")
@@ -171,10 +175,14 @@ class AudioTextDialog(QDialog):
     def get_filtered_audio_text(self, data: dict):
         row: int = self.flight_combobox.currentIndex()
         flight: QStandardItem = self.flight_combobox_model.item(row)
-        if data.get('is_has_avia') is True and flight.data().get('is_has_avia') is False:
-            return False
-        if data.get('id') in flight.data().get('audio_text_id_list'):
-            return True
+        if flight.data().get('direction_id'):
+            if data.get('is_has_avia') is True and flight.data().get('is_has_avia') is False:
+                return False
+            if data.get('id') in flight.data().get('audio_text_id_list'):
+                return True
+        else:
+            if data.get('direction_id') is None:
+                return True
 
     async def get_audio_text_reasons_from_API(self) -> None:
         url_file = QUrl(settings.api_url+'get_audio_text_reasons')
@@ -237,14 +245,21 @@ class AudioTextDialog(QDialog):
         current_data: list = list(filter(self.get_filtered_audio_text, self.audio_text_data_origin))
         # current_data: list = list(filter(lambda d: d.get('direction_id') == direction_id, self.audio_text_data_origin))
 
-        self.flight_info_layout.itemAt(0).widget().setText(f"Время рейса: {flight.data().get('plan_flight_time')}")
-        self.flight_info_layout.itemAt(1).widget().setText(f"Направление: {flight.data().get('direction')}")
-        if direction_id == 1:
-            self.flight_info_layout.itemAt(2).widget().setText(f"Маршрут: {flight.data().get('airport_to')}")
+        if direction_id:
+            self.flight_info_layout.itemAt(0).widget().setText(f"Время рейса: {flight.data().get('plan_flight_time')}")
+            self.flight_info_layout.itemAt(1).widget().setText(f"Направление: {flight.data().get('direction')}")
+            if direction_id == 1:
+                self.flight_info_layout.itemAt(2).widget().setText(f"Маршрут: {flight.data().get('airport_to')}")
+            else:
+                self.flight_info_layout.itemAt(2).widget().setText(f"Маршрут: {flight.data().get('airport_from')}")
+            self.flight_info_layout.itemAt(3).widget().setText(f"Терминал: {flight.data().get('terminal')[0]}")
+            self.flight_info_layout.itemAt(4).widget().setText(f"Выходы: {','.join(flight.data().get('boarding_gates')) if flight.data().get('boarding_gates') else ''}")
         else:
-            self.flight_info_layout.itemAt(2).widget().setText(f"Маршрут: {flight.data().get('airport_from')}")
-        self.flight_info_layout.itemAt(3).widget().setText(f"Терминал: {flight.data().get('terminal')[0]}")
-        self.flight_info_layout.itemAt(4).widget().setText(f"Выходы: {','.join(flight.data().get('boarding_gates')) if flight.data().get('boarding_gates') else ''}")
+            self.flight_info_layout.itemAt(0).widget().setText("")
+            self.flight_info_layout.itemAt(1).widget().setText("")
+            self.flight_info_layout.itemAt(2).widget().setText("")
+            self.flight_info_layout.itemAt(3).widget().setText("")
+            self.flight_info_layout.itemAt(4).widget().setText("")
 
         current_data: list = list(map(lambda data: (data.get('id'), data.get('name'), ', '.join(map(str, data.get('zones'))), data.get('description')), current_data))
         self.audio_text_table.table_model.setItems(current_data)

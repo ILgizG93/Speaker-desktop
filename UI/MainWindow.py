@@ -155,6 +155,11 @@ class SpeakerApplication(QMainWindow):
         from .SpeakerStatusBar import speaker_status_bar
         self.setStatusBar(speaker_status_bar)
         self.statusBar().setStyleSheet("font-size: 16px")
+        
+        self.old_audio_delete_timer = QTimer()
+        self.old_audio_delete_timer.setInterval(settings.old_audio_delete_time)
+        self.old_audio_delete_timer.timeout.connect(lambda: asyncio.run(self.old_audio_delete()))
+        self.old_audio_delete_timer.start()
 
     async def start_playing(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout):
         buttons.btn_sound_play.setHidden(True)
@@ -255,8 +260,8 @@ class SpeakerApplication(QMainWindow):
         if reply:
             reply_code, reply_message, reply_body = reply
             if reply_code in [200]:
-                self.schedule_table.current_schedule_id = '_'.join(map(str, reply_body.values()))
-                asyncio.run(self.schedule_table.get_scheduler_data_from_API())
+                self.schedule_table.current_schedule_id = f"{reply_body.get('flight_id')}_{reply_body.get('audio_text_id')}"
+                asyncio.run(self.schedule_table.get_scheduler_data_from_API(reply_body.get('flight_id'), reply_body.get('audio_text_id')))
             self.open_message_dialog(reply_message)
         self.schedule_table.timer.start()
 
@@ -289,12 +294,12 @@ class SpeakerApplication(QMainWindow):
                 case QtNetwork.QNetworkReply.NetworkError.NoError:
                     info_message = "Объявление удалено"
                     logger.info(info_message)
-                    self.open_message_dialog(info_message)
                     if table.__class__.__name__ == 'ScheduleTable':
                         delete_all_audio: bool = self.delete_audio_text_dialog.delete_all_audio
                         table.delete_schedule(delete_all_audio)
                     else:
                         table.delete_schedule()
+                    self.open_message_dialog(info_message)
 
                 case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
                     error_message = f"Объявление не удалено. Ошибка подключения к API: {result.errorString()}"
@@ -307,3 +312,13 @@ class SpeakerApplication(QMainWindow):
     def open_message_dialog(self, message: str) -> None:
         self.message_dialog: MessageDialog = MessageDialog(self, message)
         self.message_dialog.exec()
+
+    async def old_audio_delete(self):
+        url_file = QUrl(settings.api_url+'old_audio_delete')
+        query = QUrlQuery()
+        query.addQueryItem('old_audio_days', str(settings.old_audio_days))
+        url_file.setQuery(query.query())
+        request = QtNetwork.QNetworkRequest(url_file)
+        request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
+        self.API_delete = QtNetwork.QNetworkAccessManager()
+        self.API_delete.post(request, QJsonDocument().toJson())

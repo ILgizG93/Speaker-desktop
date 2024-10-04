@@ -1,5 +1,7 @@
 import json
 import asyncio
+from functools import partial
+import operator
 
 from typing import Optional
 from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout
@@ -59,15 +61,21 @@ class ScheduleTable(QTableWidget):
         from UI.SpeakerStatusBar import speaker_status_bar
         self.speaker_status_bar = speaker_status_bar
     
-    async def get_scheduler_data_from_API(self) -> None:
+    async def get_scheduler_data_from_API(self, flight_id: int = None, audio_text_id: int = None) -> None:
         self.timer.stop()
         url_file = QUrl(settings.api_url+'get_scheduler')
+        if flight_id and audio_text_id:
+            query = QUrlQuery()
+            query.addQueryItem('flight_id', str(flight_id))
+            query.addQueryItem('audio_text_id', str(audio_text_id))
+            url_file.setQuery(query.query())
+
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         self.API_manager.get(request)
-        self.API_manager.finished.connect(self.refresh_schedule_table)
+        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, flight_id, audio_text_id))
 
-    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply) -> None:
+    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, flight_id: int = None, audio_text_id: int = None) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 self.schedule_data: list = []
@@ -75,11 +83,28 @@ class ScheduleTable(QTableWidget):
                 if len(str(bytes_string, 'utf-8')) == 0:
                     self.setRowCount(0)
                 else:
-                    self.data_origin: dict = json.loads(str(bytes_string, 'utf-8'))
-                    for data in self.data_origin:
+                    if flight_id and audio_text_id:
+                        current_data = json.loads(str(bytes_string, 'utf-8'))[0]
+                        self.data_origin.append(current_data)
+                        self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
+                        row_indx: int = 0
+                        for indx, data in enumerate(self.data_origin):
+                            if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
+                                current_schedule: list = [data]
+                                row_indx = indx
+                                break
+                        temp_data = [self.data_origin[row_indx]]
+                    else:
+                        self.data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
+                        temp_data = self.data_origin
+                    for data in temp_data:
+                        if data.get('audio_text_description'):
+                            audio_text = f"{data.get('audio_text')} ({data.get('audio_text_description')})"
+                        else:
+                            audio_text = f"{data.get('audio_text')}"
                         self.schedule_data.append((
                             data.get('schedule_id'), data.get('flight_number_full'), data.get('direction'), data.get('plan_flight_time'), data.get('public_flight_time'), 
-                            data.get('audio_text'), data.get('airport'),
+                            audio_text, data.get('airport'),
                             data.get('languages').get('RUS').get('display'),
                             data.get('languages').get('TAT').get('display'),
                             data.get('languages').get('ENG').get('display'), 
@@ -87,49 +112,24 @@ class ScheduleTable(QTableWidget):
                             *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
                             data.get('is_played')
                         ))
-                    if (len(self.schedule_data) == 0):
-                        self.schedule_data = [(None,) * len(self.header)]
-                        self.setRowCount(0)
+                    if flight_id and audio_text_id:
+                        self.insertRow(row_indx)
+                        self.set_row_data(row_indx, self.schedule_data[0], temp_data[0])
+                        self.resizeRowToContents(row_indx)
                     else:
-                        self.setRowCount(len(self.schedule_data))
-                        for row_indx, data in enumerate(self.schedule_data):
-                            current_schedule: list = list(filter(lambda d: data[0] == d.get('schedule_id'), self.data_origin))
-                            if len(current_schedule) > 0:
-                                current_schedule: dict = current_schedule[0]
-                                for col_indx, item in enumerate(data):
-                                    if col_indx in [2,3,4,10,11]:
-                                        element = QTableWidgetItem(item)
-                                        element.setFont(self.font.get_font())
-                                        element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                                        self.setItem(row_indx, col_indx, element)
-                                    elif col_indx in [i for i in range(11, 11+len(self.zones)+1)]:
-                                        widget = QWidget()
-                                        checkbox = TableCheckbox(row_indx, col_indx)
-                                        checkbox.setChecked(item)
-                                        checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
-                                        layoutH = QHBoxLayout(widget)
-                                        layoutH.addWidget(checkbox)
-                                        layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                                        self.setCellWidget(row_indx, col_indx, widget)
-                                    elif col_indx in [7,8,9]:
-                                        widget = QWidget()
-                                        layoutH = QHBoxLayout(widget)
-                                        layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                                        if item:
-                                            checkbox = TableCheckbox(row_indx, col_indx)
-                                            checkbox.setChecked(col_indx-6 in current_schedule.get('languages_list'))
-                                            checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
-                                            layoutH.addWidget(checkbox)
-                                        self.setCellWidget(row_indx, col_indx, widget)
-                                    elif col_indx in [11+len(self.zones)+1] and item:
-                                        self.set_mark_in_cell(row_indx, col_indx)
-                                    else:
-                                        element = QTableWidgetItem(item)
-                                        element.setFont(self.font.get_font())
-                                        self.setItem(row_indx, col_indx, element)
-                            else:
-                                self.removeRow(0)
-                            self.resizeRowToContents(row_indx)
+                        if (len(self.schedule_data) == 0):
+                            self.schedule_data = [(None,) * len(self.header)]
+                            self.setRowCount(0)
+                        else:
+                            self.setRowCount(len(self.schedule_data))
+                            for row_indx, data in enumerate(self.schedule_data):
+                                current_schedule: list = list(filter(lambda d: data[0] == d.get('schedule_id'), self.data_origin))
+                                if len(current_schedule) > 0:
+                                    current_schedule: dict = current_schedule[0]
+                                    self.set_row_data(row_indx, data, current_schedule)
+                                else:
+                                    self.removeRow(0)
+                                self.resizeRowToContents(row_indx)
                 info_message = "Данные обновлены"
                 self.speaker_status_bar.setStatusBarText(text=info_message)
                 self.set_active_row()
@@ -139,6 +139,39 @@ class ScheduleTable(QTableWidget):
                 self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
 
         self.timer.start()
+
+    def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
+        for col_indx, item in enumerate(data):
+            if col_indx in [2,3,4,10,11]:
+                element = QTableWidgetItem(item)
+                element.setFont(self.font.get_font())
+                element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.setItem(row_indx, col_indx, element)
+            elif col_indx in [i for i in range(11, 11+len(self.zones)+1)]:
+                widget = QWidget()
+                checkbox = TableCheckbox(row_indx, col_indx)
+                checkbox.setChecked(item)
+                checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
+                layoutH = QHBoxLayout(widget)
+                layoutH.addWidget(checkbox)
+                layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.setCellWidget(row_indx, col_indx, widget)
+            elif col_indx in [7,8,9]:
+                widget = QWidget()
+                layoutH = QHBoxLayout(widget)
+                layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                if item:
+                    checkbox = TableCheckbox(row_indx, col_indx)
+                    checkbox.setChecked(col_indx-6 in current_schedule.get('languages_list'))
+                    checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
+                    layoutH.addWidget(checkbox)
+                self.setCellWidget(row_indx, col_indx, widget)
+            elif col_indx in [11+len(self.zones)+1] and item:
+                self.set_mark_in_cell(row_indx, col_indx)
+            else:
+                element = QTableWidgetItem(item)
+                element.setFont(self.font.get_font())
+                self.setItem(row_indx, col_indx, element)
 
     def set_mark_in_cell(self, row_indx: int, col_indx: int):
         element = QTableWidgetItem('✓')
@@ -180,9 +213,9 @@ class ScheduleTable(QTableWidget):
             return self.data_origin[0]
     
     def set_active_schedule_id(self) -> None:
-        current_data = self.get_current_row_data(self.get_current_row_id())
-        if current_data:
-            self.current_schedule_id = current_data.get('schedule_id')
+        self.current_data = self.get_current_row_data(self.get_current_row_id())
+        if self.current_data:
+            self.current_schedule_id = self.current_data.get('schedule_id')
 
     def set_active_row(self) -> None:
         if self.current_data and self.current_data.get('schedule_id'):
@@ -287,12 +320,14 @@ class ScheduleTable(QTableWidget):
     def delete_schedule(self, delete_all_audio: bool = None) -> None:
         flight_id: int = self.current_data.get('flight_id')
         audio_text_id: int = self.current_data.get('audio_text_id')
+        current_row_number = self.currentRow()
         for row in reversed(range(self.model().rowCount())):
             indx = self.model().index(row, 0)
             if indx.data():
                 row_flight_id, row_audio_text_id = map(int, indx.data().split('_'))
                 if (row_flight_id == flight_id and delete_all_audio is True) or (row_flight_id == flight_id and row_audio_text_id == audio_text_id):
                     self.removeRow(row)
+                self.selectRow(current_row_number)
             else:
                 break
 

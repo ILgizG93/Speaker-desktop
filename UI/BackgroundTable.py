@@ -106,6 +106,7 @@ class BackgroundTable(QTableWidget):
                                     element = QTableWidgetItem(item)
                                     element.setFont(self.font.get_font())
                                     self.setItem(row_indx, col_indx, element)
+                                self.resizeRowToContents(row_indx)
                 info_message = "Фоновые объявления обновлены"
                 self.speaker_status_bar.setStatusBarText(text=info_message)
                 self.set_active_row()
@@ -199,7 +200,7 @@ class BackgroundTable(QTableWidget):
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
-        body = QJsonDocument({'languages': self.get_current_languages()})
+        body = QJsonDocument({'languages': self.get_current_languages(), 'zones': self.get_current_zones()})
 
         reply = self.API_manager.post(request, body.toJson())
         self.API_manager.finished.connect(lambda: self.play_signal.emit(reply))
