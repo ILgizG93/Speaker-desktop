@@ -1,6 +1,9 @@
 import asyncio
 import requests
+import os
 
+from datetime import datetime, timedelta
+from pathlib import Path
 import sounddevice as sd
 import soundfile as sf
 from math import ceil
@@ -157,11 +160,20 @@ class SpeakerApplication(QMainWindow):
         self.statusBar().setStyleSheet("font-size: 16px")
         
         self.old_audio_delete_timer = QTimer()
-        self.old_audio_delete_timer.setInterval(settings.old_audio_delete_time)
+        self.old_audio_delete_timer.setInterval(settings.old_audio_delete_time*1000)
         self.old_audio_delete_timer.timeout.connect(lambda: asyncio.run(self.old_audio_delete()))
         self.old_audio_delete_timer.start()
 
+    def set_play_buttons_disabled(self, disabled: bool = False):
+        if disabled:
+            self.schedule_button_layout.btn_sound_play.setDisabled(True)
+            self.background_button_layout.btn_sound_play.setDisabled(True)
+        else:
+            self.schedule_button_layout.btn_sound_play.setEnabled(True)
+            self.background_button_layout.btn_sound_play.setEnabled(True)
+
     async def start_playing(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout):
+        self.set_play_buttons_disabled(True)
         buttons.btn_sound_play.setHidden(True)
         buttons.btn_sound_stop.setVisible(True)
         buttons.btn_sound_stop.setDisabled(True)
@@ -230,6 +242,7 @@ class SpeakerApplication(QMainWindow):
         self.play_finish_timer.start()
 
     def stop_play(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, is_manual_pressed: bool = False) -> None:
+        self.set_play_buttons_disabled(False)
         table.setEnabled(True)
         buttons.btn_sound_delete.setEnabled(True)
         sd.stop()
@@ -314,6 +327,12 @@ class SpeakerApplication(QMainWindow):
         self.message_dialog.exec()
 
     async def old_audio_delete(self):
+        files_path = Path(settings.file_url)
+        for f in os.listdir(files_path):
+            current_datetime: float = (datetime.now().replace(tzinfo=None) - timedelta(seconds=settings.old_audio_days * 86400)).timestamp()
+            if os.stat(os.path.join(files_path,f)).st_mtime < current_datetime:
+                os.remove(f'{files_path}\{f}')
+    
         url_file = QUrl(settings.api_url+'old_audio_delete')
         query = QUrlQuery()
         query.addQueryItem('old_audio_days', str(settings.old_audio_days))

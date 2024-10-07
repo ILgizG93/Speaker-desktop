@@ -46,7 +46,7 @@ class BackgroundTable(QTableWidget):
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
         self.timer = QTimer()
-        self.timer.setInterval(settings.background_schedule_update_time)
+        self.timer.setInterval(settings.background_schedule_update_time*1000)
         self.timer.timeout.connect(lambda: asyncio.run(self.get_background_data_from_API()))
 
         from UI.SpeakerStatusBar import speaker_status_bar

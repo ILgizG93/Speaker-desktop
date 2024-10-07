@@ -46,6 +46,10 @@ class SpeakerSetting():
                 'old_audio_days': self.old_audio_days,
                 'old_audio_delete_time': self.old_audio_delete_time,
                 'device': self.device,
+                'api_url': self.api_url,
+                'log_file_path': self.log_file_path,
+                'file_url': self.file_url,
+                'file_format': self.file_format
             }
             json.dump(data, json_file, ensure_ascii=False, indent=4)
 
