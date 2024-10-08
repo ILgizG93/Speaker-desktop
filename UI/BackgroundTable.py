@@ -182,7 +182,7 @@ class BackgroundTable(QTableWidget):
             return
 
         self.current_data = self.get_current_row_data(row_id)
-        self.current_sound_file = root_directory+'/'+settings.file_url+str(self.current_data.get('audio_text_id'))+settings.file_format
+        self.current_sound_file = root_directory+'/'+settings.file_name
         self.current_audio_id = self.current_data.get('audio_text_id')
 
         if len(self.get_current_languages()) == 0:

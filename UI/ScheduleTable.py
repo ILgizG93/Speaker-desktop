@@ -248,7 +248,7 @@ class ScheduleTable(QTableWidget):
             return
         
         self.current_data = self.get_current_row_data(row_id)
-        self.current_sound_file = root_directory+'/'+settings.file_url+self.current_data.get('schedule_id')+settings.file_format
+        self.current_sound_file = root_directory+'/'+settings.file_name
         self.current_schedule_id = self.current_data.get('schedule_id')
 
         check = self.sound_data_check()

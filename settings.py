@@ -17,7 +17,7 @@ class SpeakerSetting():
         self.old_audio_delete_time: int
         self.device: dict
         self.log_file_path: str
-        self.file_url: str
+        self.file_name: str
         self.file_format: str
         
         if os.path.isfile(SETTINGS_FILE_NAME):
@@ -48,7 +48,7 @@ class SpeakerSetting():
                 'device': self.device,
                 'api_url': self.api_url,
                 'log_file_path': self.log_file_path,
-                'file_url': self.file_url,
+                'file_name': self.file_name,
                 'file_format': self.file_format
             }
             json.dump(data, json_file, ensure_ascii=False, indent=4)
