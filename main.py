@@ -12,7 +12,7 @@ def main():
     settings.apply_theme(settings.theme)
 
     speaker = SpeakerApplication()
-    # speaker.showMaximized()
+    speaker.showMaximized()
     speaker.show()
 
     asyncio.run(speaker.schedule_table.get_scheduler_data_from_API())
