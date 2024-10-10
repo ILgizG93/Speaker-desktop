@@ -13,8 +13,6 @@ class SpeakerSetting():
         self.api_url: str
         self.schedule_update_time: int
         self.background_schedule_update_time: int
-        self.old_audio_days: int
-        self.old_audio_delete_time: int
         self.device: dict
         self.log_file_path: str
         self.file_name: str
@@ -43,8 +41,6 @@ class SpeakerSetting():
                 'theme': self.theme,
                 'schedule_update_time': self.schedule_update_time,
                 'background_schedule_update_time': self.background_schedule_update_time,
-                'old_audio_days': self.old_audio_days,
-                'old_audio_delete_time': self.old_audio_delete_time,
                 'device': self.device,
                 'api_url': self.api_url,
                 'log_file_path': self.log_file_path,

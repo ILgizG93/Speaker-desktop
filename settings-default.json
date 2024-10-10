@@ -3,8 +3,6 @@
     "theme": "Dark Theme",
     "schedule_update_time": 60,
     "background_schedule_update_time": 300,
-    "old_audio_days": 1,
-    "old_audio_delete_time": 7200,
     "device": {
         "id": "",
         "samplerate": 48000,
