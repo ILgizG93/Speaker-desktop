@@ -84,20 +84,22 @@ class ScheduleTable(QTableWidget):
                     self.setRowCount(0)
                 else:
                     if flight_id and audio_text_id:
-                        current_data = json.loads(str(bytes_string, 'utf-8'))[0]
-                        self.data_origin.append(current_data)
-                        self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
+                        received_data: dict = json.loads(str(bytes_string, 'utf-8'))[0]
+                        is_has_row_in_table: bool = len(list(filter(lambda d: d.get('flight_id') == flight_id and d.get('audio_text_id') == audio_text_id, self.data_origin))) != 0                       
                         row_indx: int = 0
-                        for indx, data in enumerate(self.data_origin):
-                            if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
-                                current_schedule: list = [data]
-                                row_indx = indx
-                                break
-                        temp_data = [self.data_origin[row_indx]]
+                        if is_has_row_in_table is not True:
+                            self.data_origin.append(received_data)
+                            self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
+                            for indx, data in enumerate(self.data_origin):
+                                if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
+                                    current_schedule: list = [data]
+                                    row_indx = indx
+                                    break
+                        received_data: list[dict] = [self.data_origin[row_indx]]
                     else:
                         self.data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
-                        temp_data = self.data_origin
-                    for data in temp_data:
+                        received_data: list[dict] = self.data_origin
+                    for data in received_data:
                         if data.get('audio_text_description'):
                             audio_text = f"{data.get('audio_text')} ({data.get('audio_text_description')})"
                         else:
@@ -113,9 +115,11 @@ class ScheduleTable(QTableWidget):
                             data.get('is_played')
                         ))
                     if flight_id and audio_text_id:
-                        self.insertRow(row_indx)
-                        self.set_row_data(row_indx, self.schedule_data[0], temp_data[0])
-                        self.resizeRowToContents(row_indx)
+                        if is_has_row_in_table is not True:
+                            self.insertRow(row_indx)
+                            self.set_row_data(row_indx, self.schedule_data[0], received_data[0])
+                            self.resizeRowToContents(row_indx)
+                            self.selectRow(row_indx)
                     else:
                         if (len(self.schedule_data) == 0):
                             self.schedule_data = [(None,) * len(self.header)]
@@ -326,6 +330,7 @@ class ScheduleTable(QTableWidget):
             if indx.data():
                 row_flight_id, row_audio_text_id = map(int, indx.data().split('_'))
                 if (row_flight_id == flight_id and delete_all_audio is True) or (row_flight_id == flight_id and row_audio_text_id == audio_text_id):
+                    self.data_origin.pop(row)
                     self.removeRow(row)
                 self.selectRow(current_row_number)
             else:
