@@ -22,9 +22,9 @@ def exit_program_bcs_err():
 
 class TableCheckbox(QCheckBox):
     def __init__(self, row_indx, col_indx):
-        super().__init__()        
+        super().__init__()
         self.setObjectName(f'{row_indx}_{col_indx}')
         self.setStyleSheet("QCheckBox::indicator" "{" "width :20px;" "height : 20px;" "}")
         self.setFixedWidth(22)
-        self.setFixedHeight(32)
+        self.setFixedHeight(22)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
