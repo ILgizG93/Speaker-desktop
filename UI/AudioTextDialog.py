@@ -1,12 +1,10 @@
 import json
-from datetime import datetime
 
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox, QTimeEdit
-from PySide6.QtCore import Qt, Slot, QUrl, QUrlQuery, QJsonDocument, Signal, QTime
+from PySide6.QtCore import Qt, Slot, QUrl, QJsonDocument, Signal, QTime
 from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
 from PySide6 import QtNetwork
 
-from typing import Optional
 from globals import settings, logger
 from .AudioTextTable import AudioTextTable
 from .Font import RobotoFont
@@ -26,13 +24,11 @@ class AudioTextDialog(QDialog):
         self.layout: QGridLayout = QGridLayout(self)
 
         self.flight_label = QLabel("Укажите рейс")
-        self.flight_label.setFixedWidth(120)
-        self.flight_label.setFixedHeight(20)
+        self.flight_label.setFixedSize(120, 20)
 
         self.flight_combobox_model = QStandardItemModel()
         self.flight_combobox = QComboBox()
-        self.flight_combobox.setFixedWidth(170)
-        self.flight_combobox.setFixedHeight(20)
+        self.flight_combobox.setFixedSize(170, 20)
         self.flight_combobox.setCursor(Qt.CursorShape.PointingHandCursor)
         self.flight_combobox.currentIndexChanged[int].connect(self.display_flight_info)
         self.flight_combobox.setModel(self.flight_combobox_model)
