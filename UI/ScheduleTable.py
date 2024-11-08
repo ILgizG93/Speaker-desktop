@@ -1,18 +1,31 @@
 import json
 import asyncio
-from functools import partial
-import operator
 
 from typing import Optional
-from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout
-from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal
-from PySide6.QtGui import QBrush, QColor
+from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox
+from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent
+from PySide6.QtGui import QBrush, QColor, QStandardItem, QStandardItemModel
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, logger, TableCheckbox
 from .Font import RobotoFont
 
+class ComboBox(QComboBox):
+    def wheelEvent(self, ev):
+        if ev.type() == QEvent.Type.Wheel:
+            ev.ignore()
+
+class TextEdit(QTextEdit):
+    enter_pressed_signal: Signal = Signal()
+
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.enter_pressed_signal.emit()
+            return
+        super().keyPressEvent(event)
+
 class ScheduleTable(QTableWidget):
+    terminals: list[dict]
     current_schedule_id: str = None
     current_data: dict = {}
     play_signal: Signal = Signal(QtNetwork.QNetworkReply)
@@ -28,7 +41,7 @@ class ScheduleTable(QTableWidget):
 
         self.font: RobotoFont = RobotoFont()
 
-        self.setMinimumWidth(450)
+        self.setMinimumWidth(500)
         
         self.setHorizontalHeaderLabels(self.header)
         self.setColumnHidden(0, True)
@@ -37,12 +50,13 @@ class ScheduleTable(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
-        self.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(8, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(9, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(10, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(11, QHeaderView.ResizeMode.ResizeToContents)
+        self.setColumnWidth(6, 220)
         self.setColumnWidth(7, 32)
         self.setColumnWidth(8, 32)
         self.setColumnWidth(9, 32)
@@ -61,21 +75,23 @@ class ScheduleTable(QTableWidget):
         from UI.SpeakerStatusBar import speaker_status_bar
         self.speaker_status_bar = speaker_status_bar
     
-    async def get_scheduler_data_from_API(self, flight_id: int = None, audio_text_id: int = None) -> None:
+    async def get_scheduler_data_from_API(self, set_timer: bool = True, flight_id: int = None, audio_text_id: int = None, flight_number: str = None) -> None:
         self.timer.stop()
         url_file = QUrl(settings.api_url+'get_scheduler')
+        query = QUrlQuery()
         if flight_id and audio_text_id:
-            query = QUrlQuery()
             query.addQueryItem('flight_id', str(flight_id))
             query.addQueryItem('audio_text_id', str(audio_text_id))
-            url_file.setQuery(query.query())
+        elif flight_number:
+            query.addQueryItem('flight_number', flight_number)
+        url_file.setQuery(query.query())
 
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         self.API_manager.get(request)
-        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, flight_id, audio_text_id))
+        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, set_timer, flight_id, audio_text_id))
 
-    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, flight_id: int = None, audio_text_id: int = None) -> None:
+    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, set_timer: bool, flight_id: int = None, audio_text_id: int = None) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 self.schedule_data: list = []
@@ -112,7 +128,7 @@ class ScheduleTable(QTableWidget):
                             data.get('languages').get('ENG').get('display'), 
                             data.get('terminal'), data.get('boarding_gates'),
                             *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
-                            data.get('is_played')
+                            data.get('is_played'), data.get('direction_id')
                         ))
                     if flight_id and audio_text_id:
                         if is_has_row_in_table is not True:
@@ -141,21 +157,22 @@ class ScheduleTable(QTableWidget):
             case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
                 error_message = f"Данные не обновлены. Ошибка подключения к API: {result.errorString()}"
                 self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
-
-        self.timer.start()
+        
+        if set_timer:
+            self.timer.start()
 
     def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
         for col_indx, item in enumerate(data):
-            if col_indx in [2,3,4,10,11]:
+            if col_indx in [2,3,4]:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
                 element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.setItem(row_indx, col_indx, element)
-            elif col_indx in [i for i in range(11, 11+len(self.zones)+1)]:
+            elif col_indx in [i for i in range(12, 11+len(self.zones)+1)]:
                 widget = QWidget()
                 checkbox = TableCheckbox(row_indx, col_indx)
                 checkbox.setChecked(item)
-                checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
+                checkbox.checkStateChanged.connect(self.on_widget_state_change)
                 layoutH = QHBoxLayout(widget)
                 layoutH.addWidget(checkbox)
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -167,20 +184,56 @@ class ScheduleTable(QTableWidget):
                 if item:
                     checkbox = TableCheckbox(row_indx, col_indx)
                     checkbox.setChecked(col_indx-6 in current_schedule.get('languages_list'))
-                    checkbox.checkStateChanged.connect(self.on_checkbox_state_change)
+                    checkbox.checkStateChanged.connect(self.on_widget_state_change)
                     layoutH.addWidget(checkbox)
+                self.setCellWidget(row_indx, col_indx, widget)
+            elif col_indx in [10]:
+                widget = QWidget()
+                layoutH = QHBoxLayout(widget)
+                layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                model = QStandardItemModel()
+                combobox = ComboBox()
+                combobox.setObjectName(f'{row_indx}_{col_indx}')
+                combobox.setFont(self.font.get_font(10))
+                combobox.setFixedSize(50, 26)
+                combobox.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+                combobox.setCursor(Qt.CursorShape.PointingHandCursor)
+                combobox.setModel(model)
+                for terminal in self.terminals:
+                    combobox_item = QStandardItem(terminal.get('name'))
+                    combobox_item.setData(terminal)
+                    model.appendRow(combobox_item)
+                    if item == terminal.get('name'):
+                        combobox.setCurrentIndex(model.rowCount()-1)
+                combobox.currentIndexChanged[int].connect(self.on_widget_state_change)
+                layoutH.addWidget(combobox)
+                self.setCellWidget(row_indx, col_indx, widget)
+            elif col_indx in [11] and data[-1] == 1:
+                widget = QWidget()
+                layoutH = QHBoxLayout(widget)
+                layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                text_edit = TextEdit(self)
+                text_edit.setObjectName(f'{row_indx}_{col_indx}')
+                text_edit.setText(item)
+                text_edit.setFont(self.font.get_font(10))
+                text_edit.setFixedSize(50, 30)
+                text_edit.enter_pressed_signal.connect(self.on_widget_state_change)
+                text_edit.selectionChanged.connect(self.select_current_row)
+                layoutH.addWidget(text_edit)
                 self.setCellWidget(row_indx, col_indx, widget)
             elif col_indx in [11+len(self.zones)+1] and item:
                 self.set_mark_in_cell(row_indx, col_indx)
             else:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
+                if col_indx in [5] and data[-1] == 2:
+                    element.setForeground(QBrush(QColor(50, 100, 255)))
                 self.setItem(row_indx, col_indx, element)
 
     def set_mark_in_cell(self, row_indx: int, col_indx: int):
         element = QTableWidgetItem('✓')
         element.setFont(self.font.get_font(18))
-        element.setForeground(QBrush(QColor(255, 0, 0)))
+        element.setForeground(QBrush(QColor(60, 150, 35)))
         element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setItem(row_indx, col_indx, element)
 
@@ -208,6 +261,9 @@ class ScheduleTable(QTableWidget):
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-11)
         return current_zones
+    
+    def get_current_terminal(self) -> str:
+        row: int = self.currentRow()
     
     def get_current_row_data(self, row_id: str) -> dict:
         current_data = list(filter(lambda d: d.get('schedule_id') == row_id, self.data_origin))
@@ -294,6 +350,8 @@ class ScheduleTable(QTableWidget):
             'audio_text_id': self.current_data.get('audio_text_id'),
             'languages': self.get_current_languages(), 
             'zones': self.get_current_zones(),
+            'terminal': None,
+            'boarding_gates': None,
             'is_deleted': is_deleted
         })
         self.API_post.post(request, body.toJson())
@@ -335,8 +393,12 @@ class ScheduleTable(QTableWidget):
                 self.selectRow(current_row_number)
             else:
                 break
+        
+    def select_current_row(self) -> None:
+        row, column = map(int, self.sender().objectName().split('_'))
+        self.selectRow(row)
 
-    def on_checkbox_state_change(self) -> None:
+    def on_widget_state_change(self) -> None:
         row, column = map(int, self.sender().objectName().split('_'))
         self.selectRow(row)
         self.update_schedule()

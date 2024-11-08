@@ -1,6 +1,6 @@
 {
     "working_dir": "resources",
-    "theme": "Dark Theme",
+    "theme": "Light",
     "schedule_update_time": 60,
     "background_schedule_update_time": 300,
     "device": {

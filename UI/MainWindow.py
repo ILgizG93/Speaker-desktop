@@ -1,3 +1,4 @@
+import json
 import asyncio
 import requests
 import os
@@ -8,12 +9,12 @@ from math import ceil
 from functools import partial
 from typing import Optional
 
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel
-from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
+from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument, QSize, Signal
 from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
 
-from globals import root_directory, settings, interface, logger, exit_program_bcs_err
+from globals import settings, interface, logger, exit_program_bcs_err
 from .Font import RobotoFont
 from .ScheduleTable import ScheduleTable
 from .PlayerButtonLayout import PlayerButtonLayout
@@ -23,11 +24,22 @@ from .DeleteAudioTextDialog import DeleteAudioTextDialog
 from .DeleteBackgroundDialog import DeleteBackgroundDialog
 from .MessageDialog import MessageDialog
 
+class LineEdit(QLineEdit):
+    enter_pressed_signal: Signal = Signal()
+    empty_text_signal: Signal = Signal()
+
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.enter_pressed_signal.emit()
+            return
+        if len(self.text()) == 0:
+            self.empty_text_signal.emit()
+        super().keyPressEvent(event)
+
 class SpeakerException(Exception):
     def __init__(self, message, extra_info):
         super().__init__(message)
         self.extra_info = extra_info
-
 
 class SpeakerApplication(QMainWindow):
     def __init__(self):
@@ -88,14 +100,44 @@ class SpeakerApplication(QMainWindow):
         # setting_action.setFont(font.get_font(10))
         # menu.addAction(setting_action)
 
-        self.schedule_header = ('', 'Номер рейса', '', 'Время (План)', 'Время (Расч.)', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones], 'Озвучено')
+        self.schedule_header = ('', 'Рейс', '', 'План', 'Расч.', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones], '')
         self.schedule_data = [(None,) * len(self.schedule_header)]
 
         self.schedule_layout = QVBoxLayout()
+
+        self.schedule_header_layout = QHBoxLayout()
+
+        self.flight_number_filter = LineEdit()
+        self.flight_number_filter.setPlaceholderText('Поиск по номеру рейса...')
+        self.flight_number_filter.setFixedSize(220, 34)
+        self.flight_number_filter.setFont(font.get_font(12))
+
+        self.flight_number_search_btn = QPushButton()
+        self.flight_number_search_btn.setIcon(QIcon('../resources/icons/buttons/search.png'))
+        self.flight_number_search_btn.setIconSize(QSize(18, 18))
+        self.flight_number_search_btn.setFixedSize(30, 30)
+        self.flight_number_search_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+
+        self.flight_number_search_cancel_btn = QPushButton()
+        self.flight_number_search_cancel_btn.setIcon(QIcon('../resources/icons/buttons/search_cancel.png'))
+        self.flight_number_search_cancel_btn.setIconSize(QSize(18, 18))
+        self.flight_number_search_cancel_btn.setFixedSize(30, 30)
+        self.flight_number_search_cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.flight_number_search_cancel_btn.setHidden(True)
+
+        self.flight_number_search_btn.clicked.connect(self.start_flight_searching)
+        self.flight_number_search_cancel_btn.clicked.connect(self.stop_flight_searching)
+        self.flight_number_filter.enter_pressed_signal.connect(self.flight_number_search_btn.click)
+        self.flight_number_filter.empty_text_signal.connect(self.flight_number_search_cancel_btn.click)
         
         self.schedule_label = QLabel()
         self.schedule_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.schedule_label.setText('Объявления')
+
+        self.schedule_header_layout.addWidget(self.flight_number_filter)
+        self.schedule_header_layout.addWidget(self.flight_number_search_btn)
+        self.schedule_header_layout.addWidget(self.flight_number_search_cancel_btn)
+        self.schedule_header_layout.addWidget(self.schedule_label)
 
         self.schedule_table = ScheduleTable(self.schedule_header, self.zones)
         self.schedule_table.selectionModel().selectionChanged.connect(self.schedule_table.set_active_schedule_id)
@@ -109,7 +151,7 @@ class SpeakerApplication(QMainWindow):
         self.schedule_manipulation_layout = QHBoxLayout()
         self.schedule_manipulation_layout.addLayout(self.schedule_button_layout)
         
-        self.schedule_layout.addWidget(self.schedule_label)
+        self.schedule_layout.addLayout(self.schedule_header_layout)
         self.schedule_layout.addWidget(self.schedule_table)
         self.schedule_layout.addLayout(self.schedule_manipulation_layout)
         
@@ -157,6 +199,8 @@ class SpeakerApplication(QMainWindow):
         self.setStatusBar(speaker_status_bar)
         self.statusBar().setStyleSheet("font-size: 16px")
 
+        self.schedule_table.setFocus()
+
     def set_play_buttons_disabled(self, disabled: bool = False):
         if disabled:
             self.schedule_button_layout.btn_sound_play.setDisabled(True)
@@ -164,6 +208,18 @@ class SpeakerApplication(QMainWindow):
         else:
             self.schedule_button_layout.btn_sound_play.setEnabled(True)
             self.background_button_layout.btn_sound_play.setEnabled(True)
+
+    def start_flight_searching(self):
+        flight_number: str = self.flight_number_filter.text()
+        self.flight_number_search_btn.setHidden(True)
+        self.flight_number_search_cancel_btn.setVisible(True)
+        asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_number=flight_number, set_timer=False))
+
+    def stop_flight_searching(self):
+        self.flight_number_filter.setText('')
+        self.flight_number_search_btn.setVisible(True)
+        self.flight_number_search_cancel_btn.setHidden(True)
+        asyncio.run(self.schedule_table.get_scheduler_data_from_API())
 
     async def start_playing(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout):
         self.set_play_buttons_disabled(True)
@@ -269,7 +325,7 @@ class SpeakerApplication(QMainWindow):
             reply_code, reply_message, reply_body = reply
             if reply_code in [200]:
                 self.schedule_table.current_schedule_id = f"{reply_body.get('flight_id')}_{reply_body.get('audio_text_id')}"
-                asyncio.run(self.schedule_table.get_scheduler_data_from_API(reply_body.get('flight_id'), reply_body.get('audio_text_id')))
+                asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_id=reply_body.get('flight_id'), audio_text_id=reply_body.get('audio_text_id')))
             self.open_message_dialog(reply_message)
         self.schedule_table.timer.start()
 
@@ -316,6 +372,18 @@ class SpeakerApplication(QMainWindow):
 
         table.timer.start()
         self.delete_audio_text_dialog.destroy()
+    
+    async def get_terminal_data_from_API(self) -> None:
+        url_file = QUrl(settings.api_url+'get_terminals')
+        request = QtNetwork.QNetworkRequest(url_file)
+        self.API_manager = QtNetwork.QNetworkAccessManager()
+        self.API_manager.get(request)
+        self.API_manager.finished.connect(self.set_terminals)
+
+    def set_terminals(self, terminals: QtNetwork.QNetworkReply) -> None:
+        bytes_string = terminals.readAll()
+        self.schedule_table.terminals = json.loads(str(bytes_string, 'utf-8'))
+        asyncio.run(self.schedule_table.get_scheduler_data_from_API())
 
     def open_message_dialog(self, message: str) -> None:
         self.message_dialog: MessageDialog = MessageDialog(self, message)

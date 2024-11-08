@@ -17,5 +17,5 @@ class RobotoFont(QFontDatabase):
             families |= set(QFontDatabase.applicationFontFamilies(_id))
         return families
 
-    def get_font(self, size: int=12):
+    def get_font(self, size: int=11):
         return self.font("Roboto", "Regular", size)
