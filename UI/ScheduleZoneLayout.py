@@ -16,6 +16,6 @@ class ScheduleZoneLayout(QGridLayout):
     def add_zones_to_layout(self) -> None:
         for zone in self.zones:
             zone_label = QLabel(f"{zone.get('id')}. {zone.get('name')}")
-            zone_label.setFont(RobotoFont().get_font(14))
+            zone_label.setFont(RobotoFont().get_font(9))
             zone_label.setWordWrap(True)
             self.addWidget(zone_label, (zone.get('id')-1) % 2, (zone.get('id')-1) // 2)

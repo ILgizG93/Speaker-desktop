@@ -23,6 +23,7 @@ from .AudioTextDialog import AudioTextDialog
 from .DeleteAudioTextDialog import DeleteAudioTextDialog
 from .DeleteBackgroundDialog import DeleteBackgroundDialog
 from .MessageDialog import MessageDialog
+from .ScheduleZoneLayout import ScheduleZoneLayout
 
 class LineEdit(QLineEdit):
     enter_pressed_signal: Signal = Signal()
@@ -32,8 +33,6 @@ class LineEdit(QLineEdit):
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.enter_pressed_signal.emit()
             return
-        if len(self.text()) == 0:
-            self.empty_text_signal.emit()
         super().keyPressEvent(event)
 
 class SpeakerException(Exception):
@@ -150,6 +149,8 @@ class SpeakerApplication(QMainWindow):
 
         self.schedule_manipulation_layout = QHBoxLayout()
         self.schedule_manipulation_layout.addLayout(self.schedule_button_layout)
+        self.zones_layout = ScheduleZoneLayout(self.zones)
+        self.schedule_manipulation_layout.addLayout(self.zones_layout)
         
         self.schedule_layout.addLayout(self.schedule_header_layout)
         self.schedule_layout.addWidget(self.schedule_table)
@@ -216,6 +217,7 @@ class SpeakerApplication(QMainWindow):
         asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_number=flight_number, set_timer=False))
 
     def stop_flight_searching(self):
+        self.schedule_table.setRowCount(0)
         self.flight_number_filter.setText('')
         self.flight_number_search_btn.setVisible(True)
         self.flight_number_search_cancel_btn.setHidden(True)
