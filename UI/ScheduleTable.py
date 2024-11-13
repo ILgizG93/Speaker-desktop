@@ -261,9 +261,17 @@ class ScheduleTable(QTableWidget):
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-11)
         return current_zones
-    
+
     def get_current_terminal(self) -> str:
         row: int = self.currentRow()
+        combobox: ComboBox = self.cellWidget(row,10).findChild(ComboBox)
+        return combobox.currentText()
+
+    def get_current_boarding_gates(self) -> Optional[list[int]]:
+        row: int = self.currentRow()
+        if self.cellWidget(row,11):
+            text_edit : TextEdit = self.cellWidget(row,11).findChild(TextEdit)
+            return list(map(int, text_edit.toPlainText().split(',')))
     
     def get_current_row_data(self, row_id: str) -> dict:
         current_data = list(filter(lambda d: d.get('schedule_id') == row_id, self.data_origin))
@@ -350,8 +358,8 @@ class ScheduleTable(QTableWidget):
             'audio_text_id': self.current_data.get('audio_text_id'),
             'languages': self.get_current_languages(), 
             'zones': self.get_current_zones(),
-            'terminal': None,
-            'boarding_gates': None,
+            'terminal': self.get_current_terminal(),
+            'boarding_gates': self.get_current_boarding_gates(),
             'is_deleted': is_deleted
         })
         self.API_post.post(request, body.toJson())
