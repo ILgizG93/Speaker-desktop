@@ -233,7 +233,7 @@ class SpeakerApplication(QMainWindow):
     def get_error(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, error_message: str) -> None:
         table.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
         self.open_message_dialog(error_message)
-        self.stop_play(table, buttons)
+        self.stop_play(table, buttons, is_error=True)
 
     def get_stop_signal(self, reply):
         print('stop play', reply)
@@ -292,8 +292,8 @@ class SpeakerApplication(QMainWindow):
         self.play_finish_timer.timeout.connect(lambda: self.stop_play(table, buttons))
         self.play_finish_timer.start()
 
-    def stop_play(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, is_manual_pressed: bool = False) -> None:
-        if os.path.isfile(table.current_sound_file):
+    def stop_play(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, is_manual_pressed: bool = False, is_error: bool = False) -> None:
+        if table.current_sound_file and os.path.isfile(table.current_sound_file):
             os.unlink(table.current_sound_file)
         self.set_play_buttons_disabled(False)
         table.setEnabled(True)
@@ -305,7 +305,7 @@ class SpeakerApplication(QMainWindow):
         buttons.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action='Ручная остановка воспроизведения')
-        elif table.__class__.__name__ == 'ScheduleTable':
+        elif is_error is None and table.__class__.__name__ == 'ScheduleTable':
             table.set_mark_in_cell(table.currentRow(), table.col_count-1)
             table.set_schedule_is_played()
 
