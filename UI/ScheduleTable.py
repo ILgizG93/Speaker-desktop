@@ -28,6 +28,7 @@ class ScheduleTable(QTableWidget):
     terminals: list[dict]
     current_schedule_id: str = None
     current_data: dict = {}
+    current_sound_file: str = None
     play_signal: Signal = Signal(QtNetwork.QNetworkReply)
     stop_signal: Signal = Signal(tuple)
     error_signal: Signal = Signal(str)
@@ -269,9 +270,9 @@ class ScheduleTable(QTableWidget):
 
     def get_current_boarding_gates(self) -> Optional[list[int]]:
         row: int = self.currentRow()
-        if self.cellWidget(row,11):
-            text_edit : TextEdit = self.cellWidget(row,11).findChild(TextEdit)
-            return list(map(int, text_edit.toPlainText().split(',')))
+        if text_edit := self.cellWidget(row,11).findChild(TextEdit):
+            if len(text_edit.toPlainText()) > 0:
+                return list(map(int, text_edit.toPlainText().split(',')))
     
     def get_current_row_data(self, row_id: str) -> dict:
         current_data = list(filter(lambda d: d.get('schedule_id') == row_id, self.data_origin))
@@ -311,6 +312,7 @@ class ScheduleTable(QTableWidget):
     async def get_audio_file(self):
         row_id = self.get_current_row_id()
         if row_id is None:
+            self.current_sound_file = None
             error_message: str = f"Ошибка воспроизведения: Необходимо выбрать объявление"
             self.error_signal.emit(error_message)
             return
@@ -341,7 +343,12 @@ class ScheduleTable(QTableWidget):
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
-        body = QJsonDocument({'languages': self.get_current_languages(), 'zones': self.get_current_zones()})
+        body = QJsonDocument({
+            'languages': self.get_current_languages(), 
+            'zones': self.get_current_zones(),
+            'terminal': self.get_current_terminal(),
+            'boarding_gates': self.get_current_boarding_gates(),
+        })
         
         reply = self.API_manager.post(request, body.toJson())
         self.API_manager.finished.connect(lambda: self.play_signal.emit(reply))

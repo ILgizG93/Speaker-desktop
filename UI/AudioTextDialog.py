@@ -249,7 +249,7 @@ class AudioTextDialog(QDialog):
             else:
                 self.flight_info_layout.itemAt(2).widget().setText(f"Маршрут: {flight.data().get('airport_from')}")
             self.flight_info_layout.itemAt(3).widget().setText(f"Терминал: {flight.data().get('terminal')[0]}")
-            self.flight_info_layout.itemAt(4).widget().setText(f"Выходы: {','.join(flight.data().get('boarding_gates')) if flight.data().get('boarding_gates') else ''}")
+            self.flight_info_layout.itemAt(4).widget().setText(f"Выходы: {','.join(list(map(str, flight.data().get('boarding_gates')))) if flight.data().get('boarding_gates') else ''}")
         else:
             self.flight_info_layout.itemAt(0).widget().setText("")
             self.flight_info_layout.itemAt(1).widget().setText("")
