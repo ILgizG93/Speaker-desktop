@@ -4,7 +4,7 @@ import asyncio
 from typing import Optional
 from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox
 from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent
-from PySide6.QtGui import QBrush, QColor, QStandardItem, QStandardItemModel
+from PySide6.QtGui import QBrush, QColor, QStandardItem, QStandardItemModel, QFont
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, logger, TableCheckbox
@@ -164,7 +164,7 @@ class ScheduleTable(QTableWidget):
 
     def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
         for col_indx, item in enumerate(data):
-            if col_indx in [2,3,4]:
+            if col_indx in [2,3]:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
                 element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -227,6 +227,8 @@ class ScheduleTable(QTableWidget):
             else:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
+                if col_indx in [4]:
+                    element.setForeground(QBrush(QColor(255, 25, 25)))
                 if col_indx in [5] and data[-1] == 2:
                     element.setForeground(QBrush(QColor(50, 100, 255)))
                 self.setItem(row_indx, col_indx, element)
@@ -270,9 +272,10 @@ class ScheduleTable(QTableWidget):
 
     def get_current_boarding_gates(self) -> Optional[list[int]]:
         row: int = self.currentRow()
-        if text_edit := self.cellWidget(row,11).findChild(TextEdit):
-            if len(text_edit.toPlainText()) > 0:
-                return list(map(int, text_edit.toPlainText().split(',')))
+        if self.cellWidget(row,11):
+            if text_edit := self.cellWidget(row,11).findChild(TextEdit):
+                if len(text_edit.toPlainText()) > 0:
+                    return list(map(int, text_edit.toPlainText().split(',')))
     
     def get_current_row_data(self, row_id: str) -> dict:
         current_data = list(filter(lambda d: d.get('schedule_id') == row_id, self.data_origin))
@@ -388,6 +391,8 @@ class ScheduleTable(QTableWidget):
     def after_update_schedule(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
+                self.current_data['terminal'] = self.get_current_terminal()
+                self.current_data['boarding_gates'] = self.get_current_boarding_gates()
                 logger.info(f"Данные сохранены")
 
             case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
