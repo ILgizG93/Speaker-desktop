@@ -11,7 +11,7 @@ from typing import Optional
 
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QAbstractItemView
 from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument, QSize, Signal
-from PySide6.QtGui import QIcon, QStandardItemModel
+from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
 
 from globals import settings, interface, logger, exit_program_bcs_err
@@ -78,26 +78,6 @@ class SpeakerApplication(QMainWindow):
         self.setCentralWidget(self.central_widget)
         
         self.layout: QHBoxLayout = QHBoxLayout(self.central_widget)
-
-        # menu = self.menuBar()
-        # menu.setFont(font.get_font(10))
-
-        # setting_action = QAction("&Настройки", self)
-        # setting_action.triggered.connect(lambda: print('Настройки'))
-        # setting_action.setFont(font.get_font(10))
-        # menu.addAction(setting_action)
-        # setting_action = QAction("&Зоны", self)
-        # setting_action.triggered.connect(lambda: print('Зоны'))
-        # setting_action.setFont(font.get_font(10))
-        # menu.addAction(setting_action)
-        # setting_action = QAction("&Объявления", self)
-        # setting_action.triggered.connect(lambda: print('Объявления'))
-        # setting_action.setFont(font.get_font(10))
-        # menu.addAction(setting_action)
-        # setting_action = QAction("&Фоновые объявления", self)
-        # setting_action.triggered.connect(lambda: print('Фоновые объявления'))
-        # setting_action.setFont(font.get_font(10))
-        # menu.addAction(setting_action)
 
         self.schedule_header = ('', 'Рейс', '', 'План', 'Расч.', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones], '')
         self.schedule_data = [(None,) * len(self.schedule_header)]
@@ -228,14 +208,11 @@ class SpeakerApplication(QMainWindow):
             return
         print(f"find {find_count} records.")
         self.schedule_table.setFocus()
-        # asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_number=flight_number, set_timer=False))
 
     def stop_flight_searching(self):
-        # self.schedule_table.setRowCount(0)
         self.flight_number_filter.setText('')
         self.flight_number_search_btn.setVisible(True)
         self.flight_number_search_cancel_btn.setHidden(True)
-        # asyncio.run(self.schedule_table.get_scheduler_data_from_API())
 
     async def start_playing(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout):
         self.set_play_buttons_disabled(True)
