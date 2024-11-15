@@ -14,6 +14,7 @@ class SpeakerSetting():
         self.schedule_update_time: int
         self.background_schedule_update_time: int
         self.device: dict
+        self.listen_channel: int
         self.log_file_path: str
         self.file_name: str
         self.file_format: str
@@ -42,6 +43,7 @@ class SpeakerSetting():
                 'schedule_update_time': self.schedule_update_time,
                 'background_schedule_update_time': self.background_schedule_update_time,
                 'device': self.device,
+                'listen_channel': self.listen_channel,
                 'api_url': self.api_url,
                 'log_file_path': self.log_file_path,
                 'file_name': self.file_name,

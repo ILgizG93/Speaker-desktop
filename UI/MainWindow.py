@@ -9,9 +9,9 @@ from math import ceil
 from functools import partial
 from typing import Optional
 
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QAbstractItemView
 from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument, QSize, Signal
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QStandardItemModel
 from PySide6 import QtNetwork
 
 from globals import settings, interface, logger, exit_program_bcs_err
@@ -214,14 +214,28 @@ class SpeakerApplication(QMainWindow):
         flight_number: str = self.flight_number_filter.text()
         self.flight_number_search_btn.setHidden(True)
         self.flight_number_search_cancel_btn.setVisible(True)
-        asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_number=flight_number, set_timer=False))
+        find_count: int = 0
+        for row_indx in range(self.schedule_table.rowCount()):
+            if flight_number in self.schedule_table.item(row_indx, 1).text():
+                if find_count == 0:
+                    current_index = self.schedule_table.model().index(row_indx, 1)
+                    self.schedule_table.selectRow(row_indx)
+                    self.schedule_table.scrollTo(current_index, QAbstractItemView.ScrollHint.PositionAtTop)
+                find_count += 1
+        if find_count == 0:
+            error_message: str = "Рейс не найден."
+            self.open_message_dialog(error_message)
+            return
+        print(f"find {find_count} records.")
+        self.schedule_table.setFocus()
+        # asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_number=flight_number, set_timer=False))
 
     def stop_flight_searching(self):
-        self.schedule_table.setRowCount(0)
+        # self.schedule_table.setRowCount(0)
         self.flight_number_filter.setText('')
         self.flight_number_search_btn.setVisible(True)
         self.flight_number_search_cancel_btn.setHidden(True)
-        asyncio.run(self.schedule_table.get_scheduler_data_from_API())
+        # asyncio.run(self.schedule_table.get_scheduler_data_from_API())
 
     async def start_playing(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout):
         self.set_play_buttons_disabled(True)
@@ -243,7 +257,7 @@ class SpeakerApplication(QMainWindow):
         self.file = QSaveFile(table.current_sound_file)
         data = data.readAll()
         if len(data) == 0:
-            self.get_error("Ошибка воспроизведения: Файл не сформирован.")
+            self.get_error(table, buttons, "Ошибка воспроизведения: Файл не сформирован.")
             return
         self.file.open(QIODevice.OpenModeFlag.WriteOnly)
         self.file.write(data)
@@ -278,12 +292,12 @@ class SpeakerApplication(QMainWindow):
         sd.default.device = self.device_id
         sd.default.samplerate = self.samplerate
         if len(table.get_current_zones()) == 0:
-            self.get_error("Ошибка воспроизведения: Необходимо выбрать хотя бы одну зону для воспроизведения")
+            self.get_error(table, buttons, "Ошибка воспроизведения: Необходимо выбрать хотя бы одну зону для воспроизведения")
             return
         try:
-            sd.play(data, mapping=table.get_current_zones())
+            sd.play(data, mapping=[*table.get_current_zones(), settings.listen_channel])
         except sd.PortAudioError as err:
-            self.get_error("Ошибка воспроизведения: Аудио устройство не подключено")
+            self.get_error(table, buttons, "Ошибка воспроизведения: Аудио устройство не подключено")
             return
 
         self.save_action_history(user_uuid=self.user_uuid, table=table, action='Воспроизведение объявления')
@@ -293,19 +307,22 @@ class SpeakerApplication(QMainWindow):
         self.play_finish_timer.start()
 
     def stop_play(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, is_manual_pressed: bool = False, is_error: bool = False) -> None:
+        sd.stop()
         if table.current_sound_file and os.path.isfile(table.current_sound_file):
-            os.unlink(table.current_sound_file)
+            try:
+                os.unlink(table.current_sound_file)
+            except PermissionError:
+                pass
         self.set_play_buttons_disabled(False)
         table.setEnabled(True)
         buttons.btn_sound_delete.setEnabled(True)
-        sd.stop()
         table.timer.start()
         self.play_finish_timer.stop()
         buttons.btn_sound_play.setVisible(True)
         buttons.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action='Ручная остановка воспроизведения')
-        elif is_error is None and table.__class__.__name__ == 'ScheduleTable':
+        elif is_error is False and table.__class__.__name__ == 'ScheduleTable':
             table.set_mark_in_cell(table.currentRow(), table.col_count-1)
             table.set_schedule_is_played()
 
