@@ -224,6 +224,8 @@ class ScheduleTable(QTableWidget):
                 self.setCellWidget(row_indx, col_indx, widget)
             elif col_indx in [11+len(self.zones)+1] and item:
                 self.set_mark_in_cell(row_indx, col_indx)
+            elif col_indx >= 18:
+                ...
             else:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
