@@ -1,8 +1,8 @@
 import json
 
-from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox, QTimeEdit
+from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox, QTimeEdit, QLineEdit
 from PySide6.QtCore import Qt, Slot, QUrl, QJsonDocument, Signal, QTime
-from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem
+from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem, QIntValidator
 from PySide6 import QtNetwork
 
 from globals import settings, logger
@@ -43,6 +43,11 @@ class AudioTextDialog(QDialog):
         self.terminal_combobox.setCursor(Qt.CursorShape.PointingHandCursor)
         self.terminal_combobox.setModel(self.terminal_combobox_model)
 
+        self.boarding_gate = QLineEdit()
+        self.boarding_gate.setValidator(QIntValidator(0, 99))
+        self.boarding_gate.setPlaceholderText('Номер выхода')
+        self.boarding_gate.setFixedSize(170, 26)
+
         self.event_time = QTimeEdit()
         self.event_time.setTime(QTime.currentTime())
 
@@ -56,6 +61,7 @@ class AudioTextDialog(QDialog):
         self.flight_combobox.setFont(font.get_font())
         self.audio_text_reason_combobox.setFont(font.get_font())
         self.terminal_combobox.setFont(font.get_font())
+        self.boarding_gate.setFont(font.get_font())
         self.event_time.setFont(font.get_font())
         self.audio_text_table.setFont(font.get_font())
 
@@ -89,9 +95,11 @@ class AudioTextDialog(QDialog):
 
         self.additional_layout = QVBoxLayout()
         self.additional_groupbox = QGroupBox()
+        self.additional_groupbox.setFixedWidth(350)
         self.additional_groupbox.setTitle('')
         self.additional_layout.addWidget(self.audio_text_reason_combobox)
         self.additional_layout.addWidget(self.terminal_combobox)
+        self.additional_layout.addWidget(self.boarding_gate)
         self.additional_layout.addWidget(self.event_time)
         self.additional_groupbox.setLayout(self.additional_layout)
         self.additional_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -239,7 +247,6 @@ class AudioTextDialog(QDialog):
         flight: QStandardItem = self.flight_combobox_model.item(row)
         direction_id: int = flight.data().get('direction_id')
         current_data: list = list(filter(self.get_filtered_audio_text, self.audio_text_data_origin))
-        # current_data: list = list(filter(lambda d: d.get('direction_id') == direction_id, self.audio_text_data_origin))
 
         if direction_id:
             self.flight_info_layout.itemAt(0).widget().setText(f"Время рейса: {flight.data().get('plan_flight_time')}")
@@ -279,6 +286,10 @@ class AudioTextDialog(QDialog):
             self.terminal_combobox.setVisible(True)
         else:
             self.terminal_combobox.setHidden(True)
+        if current_data.get('is_has_boarding_gate'):
+            self.boarding_gate.setVisible(True)
+        else:
+            self.boarding_gate.setHidden(True)
         if current_data.get('is_has_event_time'):
             self.event_time.setVisible(True)
         else:
@@ -292,6 +303,7 @@ class AudioTextDialog(QDialog):
         reason_id: int = None
         terminal: str = None
         event_time: str = None
+        boarding_gate: str = None
         current_data: dict = self.get_current_audio_text()
 
         if current_data.get('is_has_reason'):
@@ -316,14 +328,19 @@ class AudioTextDialog(QDialog):
                 return
             terminal = terminal_data.get('name')
 
-        if current_data.get('is_has_event_time'):
-            event_time: str = self.event_time.text()
-
         flight_indx: int = self.flight_combobox.currentIndex()
         flight_item: QStandardItem = self.flight_combobox_model.item(flight_indx)
         flight_data: dict = flight_item.data()
         flight_id: int = flight_data.get('flight_id')
         audio_text_id: int = self.audio_text_table.get_current_row_id()
+
+        if current_data.get('is_has_boarding_gate') and len(self.boarding_gate.text()) > 0:
+            boarding_gate = [int(self.boarding_gate.text())]
+        else:
+            boarding_gate = flight_data.get('boarding_gates')
+
+        if current_data.get('is_has_event_time'):
+            event_time: str = self.event_time.text()
         
         url_file = QUrl(settings.api_url+'append_audio_text_to_schedule')
         self.body = {
@@ -331,6 +348,7 @@ class AudioTextDialog(QDialog):
             'audio_text_id': audio_text_id,
             'audio_text_reason_id': reason_id,
             'terminal': terminal,
+            'boarding_gates': boarding_gate,
             'event_time': event_time
         }
         request = QtNetwork.QNetworkRequest(url_file)
