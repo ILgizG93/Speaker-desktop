@@ -42,6 +42,7 @@ class ScheduleTable(QTableWidget):
 
         self.font: RobotoFont = RobotoFont()
 
+        self.setAlternatingRowColors(True)
         self.setMinimumWidth(500)
         
         self.setHorizontalHeaderLabels(self.header)

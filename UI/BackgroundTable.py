@@ -25,6 +25,7 @@ class BackgroundTable(QTableWidget):
 
         self.font: RobotoFont = RobotoFont()
 
+        self.setAlternatingRowColors(True)
         self.setMaximumWidth(500)
 
         self.setHorizontalHeaderLabels(self.header)
