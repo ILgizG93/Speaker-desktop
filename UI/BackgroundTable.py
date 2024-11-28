@@ -142,6 +142,12 @@ class BackgroundTable(QTableWidget):
                 current_zones.append(i-4)
         return current_zones
 
+    def get_current_terminal(self) -> None:
+        return None
+
+    def get_current_boarding_gates(self) -> None:
+        return None
+
     def get_current_row_data(self, row_id: str) -> dict:
         current_data = list(filter(lambda d: d.get('audio_text_id') == int(row_id), self.data_origin))
         if current_data:
