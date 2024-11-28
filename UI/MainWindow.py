@@ -2,6 +2,7 @@ import json
 import asyncio
 import requests
 import os
+import socket
 
 import sounddevice as sd
 import soundfile as sf
@@ -62,11 +63,11 @@ class SpeakerApplication(QMainWindow):
 
         self.play_finish_timer = QTimer()
         self.device_id = interface.system_device.get(settings.device.get('name'))
-        if self.device_id is None:
-            error_message = "Аудио устройство не обнаружено"
-            logger.error(error_message)
-            self.open_message_dialog(error_message)
-            exit_program_bcs_err()
+        # if self.device_id is None:
+        #     error_message = "Аудио устройство не обнаружено"
+        #     logger.error(error_message)
+        #     self.open_message_dialog(error_message)
+        #     exit_program_bcs_err()
 
         self.samplerate = settings.device.get('samplerate')
 
@@ -112,10 +113,15 @@ class SpeakerApplication(QMainWindow):
         self.schedule_label = QLabel()
         self.schedule_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.schedule_label.setText('Объявления')
+        
+        self.time_label = QLabel()
+        self.time_label.setFixedWidth(160)
+        self.time_label.setAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.schedule_header_layout.addWidget(self.flight_number_filter)
         self.schedule_header_layout.addWidget(self.flight_number_search_btn)
         self.schedule_header_layout.addWidget(self.flight_number_search_cancel_btn)
+        self.schedule_header_layout.addWidget(self.time_label)
         self.schedule_header_layout.addWidget(self.schedule_label)
 
         self.schedule_table = ScheduleTable(self.schedule_header, self.zones)
@@ -166,6 +172,7 @@ class SpeakerApplication(QMainWindow):
         self.layout.addLayout(self.schedule_layout)
         self.layout.addLayout(self.background_layout)
 
+        self.time_label.setFont(font.get_font(14))
         self.schedule_label.setFont(font.get_font(18))
         self.background_label.setFont(font.get_font(18))
         
@@ -179,6 +186,12 @@ class SpeakerApplication(QMainWindow):
         from .SpeakerStatusBar import speaker_status_bar
         self.setStatusBar(speaker_status_bar)
         self.statusBar().setStyleSheet("font-size: 16px")
+
+        from datetime import datetime
+        self.current_time_timer = QTimer()
+        self.current_time_timer.setInterval(.8*1000)
+        self.current_time_timer.timeout.connect(lambda: self.time_label.setText(datetime.now().strftime('%d.%m.%Y %H:%M')))
+        self.current_time_timer.start()
 
         self.schedule_table.setFocus()
 
@@ -241,7 +254,7 @@ class SpeakerApplication(QMainWindow):
         self.file.commit()
         self.play_sound(table, buttons)
 
-    def save_action_history(self, user_uuid: str, table: ScheduleTable | BackgroundTable, action: str) -> None:
+    def save_action_history(self, user_uuid: str, table: ScheduleTable | BackgroundTable, action_code: int) -> None:
         url_file = QUrl(settings.api_url+'save_action_history')
         query = QUrlQuery()
         url_file.setQuery(query.query())
@@ -251,7 +264,10 @@ class SpeakerApplication(QMainWindow):
             'audio_text_id': table.current_data.get('audio_text_id'),
             'languages': ','.join(map(str, table.get_current_languages())),
             'zones': ','.join(map(str, table.get_current_zones())),
-            'action': action
+            'terminal': table.get_current_terminal(),
+            'boarding_gates': table.get_current_boarding_gates(),
+            'action_code': action_code,
+            'ipv4': socket.gethostbyname(socket.gethostname())
         })
         request = QtNetwork.QNetworkRequest(url_file)
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
@@ -268,16 +284,12 @@ class SpeakerApplication(QMainWindow):
         data, _ = sf.read(table.current_sound_file)
         sd.default.device = self.device_id
         sd.default.samplerate = self.samplerate
-        if len(table.get_current_zones()) == 0:
-            self.get_error(table, buttons, "Ошибка воспроизведения: Необходимо выбрать хотя бы одну зону для воспроизведения")
-            return
         try:
             sd.play(data, mapping=[*table.get_current_zones(), settings.listen_channel])
         except sd.PortAudioError as err:
-            self.get_error(table, buttons, "Ошибка воспроизведения: Аудио устройство не подключено")
-            return
+            sd.play(data, mapping=[1])
 
-        self.save_action_history(user_uuid=self.user_uuid, table=table, action='Воспроизведение объявления')
+        self.save_action_history(user_uuid=self.user_uuid, table=table, action_code=1)
 
         self.play_finish_timer.setInterval(duration)
         self.play_finish_timer.timeout.connect(lambda: self.stop_play(table, buttons))
@@ -298,7 +310,7 @@ class SpeakerApplication(QMainWindow):
         buttons.btn_sound_play.setVisible(True)
         buttons.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
-            self.save_action_history(user_uuid=self.user_uuid, table=table, action='Ручная остановка воспроизведения')
+            self.save_action_history(user_uuid=self.user_uuid, table=table, action_code=0)
         elif is_error is False and table.__class__.__name__ == 'ScheduleTable':
             table.set_mark_in_cell(table.currentRow(), table.col_count-1)
             table.set_schedule_is_played()
