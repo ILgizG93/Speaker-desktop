@@ -108,11 +108,12 @@ class ScheduleTable(QTableWidget):
                         if is_has_row_in_table is not True:
                             self.data_origin.append(received_data)
                             self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
-                            for indx, data in enumerate(self.data_origin):
-                                if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
-                                    current_schedule: list = [data]
-                                    row_indx = indx
-                                    break
+                        for indx, data in enumerate(self.data_origin):
+                            if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
+                                current_schedule: list = [data]
+                                row_indx = indx
+                                break
+                        self.data_origin[row_indx]['event_time'] = received_data.get('event_time')
                         received_data: list[dict] = [self.data_origin[row_indx]]
                     else:
                         self.data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
@@ -122,6 +123,8 @@ class ScheduleTable(QTableWidget):
                             audio_text = f"{data.get('audio_text')} ({data.get('audio_text_description')})"
                         else:
                             audio_text = f"{data.get('audio_text')}"
+                        if data.get('event_time'):
+                            audio_text += f" ({data.get('event_time')})"
                         self.schedule_data.append((
                             data.get('schedule_id'), data.get('flight_number_full'), data.get('direction'), data.get('plan_flight_time'), data.get('public_flight_time'), 
                             audio_text, data.get('airport'),
@@ -135,9 +138,9 @@ class ScheduleTable(QTableWidget):
                     if flight_id and audio_text_id:
                         if is_has_row_in_table is not True:
                             self.insertRow(row_indx)
-                            self.set_row_data(row_indx, self.schedule_data[0], received_data[0])
-                            self.resizeRowToContents(row_indx)
-                            self.selectRow(row_indx)
+                        self.set_row_data(row_indx, self.schedule_data[0], received_data[0])
+                        self.resizeRowToContents(row_indx)
+                        self.selectRow(row_indx)
                     else:
                         if (len(self.schedule_data) == 0):
                             self.schedule_data = [(None,) * len(self.header)]
@@ -201,12 +204,14 @@ class ScheduleTable(QTableWidget):
                 combobox.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
                 combobox.setCursor(Qt.CursorShape.PointingHandCursor)
                 combobox.setModel(model)
+                curr_cmbbx_indx: int = -1
                 for terminal in self.terminals:
                     combobox_item = QStandardItem(terminal.get('name'))
                     combobox_item.setData(terminal)
                     model.appendRow(combobox_item)
                     if item == terminal.get('name'):
-                        combobox.setCurrentIndex(model.rowCount()-1)
+                        curr_cmbbx_indx = model.rowCount()-1
+                combobox.setCurrentIndex(curr_cmbbx_indx)
                 combobox.currentIndexChanged[int].connect(self.on_widget_state_change)
                 layoutH.addWidget(combobox)
                 self.setCellWidget(row_indx, col_indx, widget)
