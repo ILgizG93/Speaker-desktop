@@ -80,7 +80,7 @@ class SpeakerApplication(QMainWindow):
         
         self.layout: QHBoxLayout = QHBoxLayout(self.central_widget)
 
-        self.schedule_header = ('', 'Рейс', '', 'План', 'Расч.', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones], '')
+        self.schedule_header = ('', '#', 'Рейс', '', 'План', 'Расч.', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones])
         self.schedule_data = [(None,) * len(self.schedule_header)]
 
         self.schedule_layout = QVBoxLayout()
@@ -312,7 +312,7 @@ class SpeakerApplication(QMainWindow):
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action_code=0)
         elif is_error is False and table.__class__.__name__ == 'ScheduleTable':
-            table.set_mark_in_cell(table.currentRow(), table.col_count-1)
+            table.set_mark_in_cell(table.currentRow(), 1)
             table.set_schedule_is_played()
 
     def open_audio_text_dialog(self) -> None:

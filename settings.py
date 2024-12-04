@@ -66,7 +66,7 @@ class SpeakerSetting():
 
 
 theme_parameters = {
-    'Default': None,
+    'Default': { 'theme': 'auto' },
     'Dark': {
         'theme': 'dark',
         'qss': "QWidget { background-color: #2f2f33; } QPushButton { border-width: 0px; }",

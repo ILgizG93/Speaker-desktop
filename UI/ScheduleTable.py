@@ -4,7 +4,7 @@ import asyncio
 from typing import Optional
 from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox
 from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent
-from PySide6.QtGui import QBrush, QColor, QStandardItem, QStandardItemModel, QFont
+from PySide6.QtGui import QColor, QStandardItem, QStandardItemModel, QFont
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, logger, TableCheckbox
@@ -42,30 +42,32 @@ class ScheduleTable(QTableWidget):
 
         self.font: RobotoFont = RobotoFont()
 
-        self.setAlternatingRowColors(True)
+        # self.setAlternatingRowColors(True)
         self.setMinimumWidth(500)
+        self.verticalHeader().setHidden(True)
         
         self.setHorizontalHeaderLabels(self.header)
         self.setColumnHidden(0, True)
-        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
-        self.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.Stretch)
-        self.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)
+        self.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        self.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
         self.horizontalHeader().setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(8, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(9, QHeaderView.ResizeMode.Fixed)
-        self.horizontalHeader().setSectionResizeMode(10, QHeaderView.ResizeMode.ResizeToContents)
+        self.horizontalHeader().setSectionResizeMode(10, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(11, QHeaderView.ResizeMode.ResizeToContents)
-        self.setColumnWidth(6, 220)
-        self.setColumnWidth(7, 32)
+        self.setColumnWidth(1, 32)
+        self.setColumnWidth(7, 220)
         self.setColumnWidth(8, 32)
         self.setColumnWidth(9, 32)
+        self.setColumnWidth(10, 32)
         for i in range(0, len(self.zones)):
-            self.horizontalHeader().setSectionResizeMode(12+i, QHeaderView.ResizeMode.Fixed)
-            self.setColumnWidth(12+i, 32)
-        self.horizontalHeader().setSectionResizeMode(12+len(self.zones), QHeaderView.ResizeMode.ResizeToContents)
+            self.horizontalHeader().setSectionResizeMode(13+i, QHeaderView.ResizeMode.Fixed)
+            self.setColumnWidth(13+i, 32)
+        self.horizontalHeader().setSectionResizeMode(13+len(self.zones), QHeaderView.ResizeMode.ResizeToContents)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -126,14 +128,14 @@ class ScheduleTable(QTableWidget):
                         if data.get('event_time'):
                             audio_text += f" ({data.get('event_time')})"
                         self.schedule_data.append((
-                            data.get('schedule_id'), data.get('flight_number_full'), data.get('direction'), data.get('plan_flight_time'), data.get('public_flight_time'), 
+                            data.get('schedule_id'), data.get('is_played'), data.get('flight_number_full'), data.get('direction'), data.get('plan_flight_time'), data.get('public_flight_time'), 
                             audio_text, data.get('airport'),
                             data.get('languages').get('RUS').get('display'),
                             data.get('languages').get('TAT').get('display'),
                             data.get('languages').get('ENG').get('display'), 
                             data.get('terminal'), data.get('boarding_gates'),
                             *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
-                            data.get('is_played'), data.get('direction_id')
+                            data.get('direction_id')
                         ))
                     if flight_id and audio_text_id:
                         if is_has_row_in_table is not True:
@@ -168,12 +170,21 @@ class ScheduleTable(QTableWidget):
 
     def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
         for col_indx, item in enumerate(data):
-            if col_indx in [2,3]:
+            if col_indx in [1]:
+                element = QTableWidgetItem(str(row_indx+1))
+                element.setFont(self.font.get_font())
+                element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.setItem(row_indx, col_indx, element)
+                cell = self.item(row_indx, col_indx)
+                cell.setBackground((QColor(92, 184, 92), QColor(240, 240, 240))[item is None])
+                cell.setFont(QFont("Roboto", weight=QFont.Weight.Bold))
+                cell.setFlags(Qt.ItemFlag.ItemIsEnabled)
+            elif col_indx in [3,4]:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
                 element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.setItem(row_indx, col_indx, element)
-            elif col_indx in [i for i in range(12, 11+len(self.zones)+1)]:
+            elif col_indx in [i for i in range(13, 12+len(self.zones)+1)]:
                 widget = QWidget()
                 checkbox = TableCheckbox(row_indx, col_indx)
                 checkbox.setChecked(item)
@@ -182,17 +193,17 @@ class ScheduleTable(QTableWidget):
                 layoutH.addWidget(checkbox)
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [7,8,9]:
+            elif col_indx in [8,9,10]:
                 widget = QWidget()
                 layoutH = QHBoxLayout(widget)
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 if item:
                     checkbox = TableCheckbox(row_indx, col_indx)
-                    checkbox.setChecked(col_indx-6 in current_schedule.get('languages_list'))
+                    checkbox.setChecked(col_indx-7 in current_schedule.get('languages_list'))
                     checkbox.checkStateChanged.connect(self.on_widget_state_change)
                     layoutH.addWidget(checkbox)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [10]:
+            elif col_indx in [11]:
                 widget = QWidget()
                 layoutH = QHBoxLayout(widget)
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -215,7 +226,7 @@ class ScheduleTable(QTableWidget):
                 combobox.currentIndexChanged[int].connect(self.on_widget_state_change)
                 layoutH.addWidget(combobox)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [11]:
+            elif col_indx in [12]:
                 widget = QWidget()
                 if data[-1] == 1:
                     layoutH = QHBoxLayout(widget)
@@ -229,25 +240,19 @@ class ScheduleTable(QTableWidget):
                     text_edit.selectionChanged.connect(self.select_current_row)
                     layoutH.addWidget(text_edit)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [11+len(self.zones)+1] and item:
-                self.set_mark_in_cell(row_indx, col_indx)
-            elif col_indx >= 18:
+            elif col_indx >= 17:
                 ...
             else:
                 element = QTableWidgetItem(item)
                 element.setFont(self.font.get_font())
-                if col_indx in [4]:
-                    element.setForeground(QBrush(QColor(255, 25, 25)))
-                if col_indx in [5] and data[-1] == 2:
-                    element.setForeground(QBrush(QColor(50, 100, 255)))
+                if col_indx in [5]:
+                    element.setForeground(QColor(255, 25, 25))
+                if col_indx in [6] and data[-1] == 2:
+                    element.setForeground(QColor(50, 100, 255))
                 self.setItem(row_indx, col_indx, element)
 
     def set_mark_in_cell(self, row_indx: int, col_indx: int):
-        element = QTableWidgetItem('✓')
-        element.setFont(self.font.get_font(18))
-        element.setForeground(QBrush(QColor(60, 150, 35)))
-        element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setItem(row_indx, col_indx, element)
+        self.item(row_indx, col_indx).setBackground(QColor(60, 150, 35))
 
     def get_current_row_id(self) -> str:
         try:
@@ -259,30 +264,30 @@ class ScheduleTable(QTableWidget):
     def get_current_languages(self) -> list[int]:
         current_languages: list[int] = []
         row: int = self.currentRow()
-        for i in range(7, 10):
+        for i in range(8, 11):
             cell = self.cellWidget(row,i)
             if cell.findChild(QCheckBox) and cell.findChild(QCheckBox).checkState() == Qt.CheckState.Checked:
-                current_languages.append(i-6)
+                current_languages.append(i-7)
         return current_languages
     
     def get_current_zones(self) -> list[int]:
         current_zones: list[int] = []
         row: int = self.currentRow()
-        for i in range(self.col_count - len(self.zones)-1, self.col_count-1):
+        for i in range(self.col_count - len(self.zones), self.col_count):
             checkbox: QCheckBox = self.cellWidget(row,i).findChild(QCheckBox)
             if checkbox.checkState() == Qt.CheckState.Checked:
-                current_zones.append(i-11)
+                current_zones.append(i-12)
         return current_zones
 
     def get_current_terminal(self) -> str:
         row: int = self.currentRow()
-        combobox: ComboBox = self.cellWidget(row,10).findChild(ComboBox)
+        combobox: ComboBox = self.cellWidget(row,11).findChild(ComboBox)
         return combobox.currentText()
 
     def get_current_boarding_gates(self) -> Optional[list[int]]:
         row: int = self.currentRow()
-        if self.cellWidget(row,11):
-            if text_edit := self.cellWidget(row,11).findChild(TextEdit):
+        if self.cellWidget(row,12):
+            if text_edit := self.cellWidget(row,12).findChild(TextEdit):
                 if len(text_edit.toPlainText()) > 0:
                     return list(map(int, text_edit.toPlainText().split(',')))
     
