@@ -24,5 +24,6 @@
     "api_url": "http://192.168.1.153/speaker/",
     "log_file_path": "loggers.json",
     "file_name": ".temp",
-    "file_format": ".mp3"
+    "file_format": ".mp3",
+    "autoplay": 1
 }

@@ -21,12 +21,14 @@ class BackgroundTable(QTableWidget):
         self.zones: dict = zones
         self.col_count: int = len(self.header)
         self.row_count: int = 0
+        self.is_autoplay: bool = False
         super().__init__(self.row_count, self.col_count, parent)
 
         self.font: RobotoFont = RobotoFont()
 
         self.setAlternatingRowColors(True)
         self.setMaximumWidth(500)
+        self.verticalHeader().setHidden(True)
 
         self.setHorizontalHeaderLabels(self.header)
         self.setColumnHidden(0, True)

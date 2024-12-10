@@ -1,6 +1,6 @@
 {
     "working_dir": "resources",
-    "theme": "Dark",
+    "theme": "Light",
     "schedule_update_time": 60,
     "background_schedule_update_time": 300,
     "device": {
@@ -24,5 +24,6 @@
     "api_url": "http://localhost:8000/speaker/",
     "log_file_path": "loggers.json",
     "file_name": ".temp",
-    "file_format": ".mp3"
+    "file_format": ".mp3",
+    "autoplay": 1
 }

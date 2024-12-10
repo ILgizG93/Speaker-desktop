@@ -200,7 +200,7 @@ class AudioTextDialog(QDialog):
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
                 self.audio_text_reason_data_origin = json.loads(str(bytes_string, 'utf-8'))
-                item = QStandardItem("Выберите причину задержки")
+                item = QStandardItem("Выберите причину")
                 self.audio_text_reason_combobox_model.appendRow(item)
                 for audio_text_reason in self.audio_text_reason_data_origin:
                     audio_text_reason: dict
@@ -311,7 +311,7 @@ class AudioTextDialog(QDialog):
             reason_item: QStandardItem = self.audio_text_reason_combobox_model.item(reason_indx)
             reason_data: dict = reason_item.data()
             if reason_data is None:
-                error_message: str = f"Ошибка добавления объявления: Необходимо выбрать причину задержки"
+                error_message: str = f"Ошибка добавления объявления: Необходимо выбрать причину"
                 logger.error(error_message)
                 self.open_message_dialog(error_message)
                 return
@@ -349,7 +349,8 @@ class AudioTextDialog(QDialog):
             'audio_text_reason_id': reason_id,
             'terminal': terminal,
             'boarding_gates': boarding_gate,
-            'event_time': event_time
+            'event_time': event_time,
+            'autoplay_is_canceled': True
         }
         request = QtNetwork.QNetworkRequest(url_file)
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
