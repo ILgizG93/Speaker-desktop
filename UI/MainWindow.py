@@ -11,7 +11,7 @@ from math import ceil
 from functools import partial
 from typing import Optional
 
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QAbstractItemView
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QAbstractItemView, QCheckBox, QFrame
 from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument, QSize, Signal
 from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
@@ -134,6 +134,19 @@ class SpeakerApplication(QMainWindow):
         self.schedule_button_layout.btn_sound_stop.clicked.connect(lambda: self.stop_play(self.schedule_table, self.schedule_button_layout, True))
         self.schedule_button_layout.btn_sound_delete.clicked.connect(partial(self.open_delete_audio_text_dialog, self.schedule_table))
 
+        self.autoplay_checkbox = QCheckBox('Автовоспроизведение')
+        self.autoplay_checkbox.setStyleSheet(
+            "QCheckBox::indicator { width :20px; height : 20px; }" 
+            "QWidget { font-weight: 600; font-size: 16px; }"
+        )
+        self.autoplay_checkbox.setFixedHeight(22)
+        self.autoplay_checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.autoplay_checkbox.checkStateChanged.connect(self.set_autoplay)
+        self.line = QFrame()
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.schedule_button_layout.addWidget(self.line, 1, 0, 1, 3)
+        self.schedule_button_layout.addWidget(self.autoplay_checkbox, 2, 0)
+
         self.schedule_manipulation_layout = QHBoxLayout()
         self.schedule_manipulation_layout.addLayout(self.schedule_button_layout)
         self.zones_layout = ScheduleZoneLayout(self.zones)
@@ -186,6 +199,7 @@ class SpeakerApplication(QMainWindow):
         self.background_table.error_signal.connect(lambda data, table = self.background_table, buttons = self.background_button_layout: self.get_error(table, buttons, data))
 
         from .SpeakerStatusBar import speaker_status_bar
+        self.speaker_status_bar = speaker_status_bar
         self.setStatusBar(speaker_status_bar)
         self.statusBar().setStyleSheet("font-size: 16px")
 
@@ -193,8 +207,22 @@ class SpeakerApplication(QMainWindow):
         self.current_time_timer.setInterval(.8*1000)
         self.current_time_timer.timeout.connect(lambda: self.time_label.setText(datetime.now().strftime('%d.%m.%Y %H:%M')))
         self.current_time_timer.start()
+        
+        self.autoplay_checkbox.setChecked(settings.autoplay)
 
         self.schedule_table.setFocus()
+    
+    def set_autoplay(self):
+        self.schedule_table.autoplay_timer.stop()
+        if self.sender().checkState() == Qt.CheckState.Checked:
+            settings.autoplay = 1
+            self.schedule_table.autoplay_timer.start()
+            info_message = "Автоматический запуск объявлений включен"
+        else:
+            settings.autoplay = 0
+            info_message = "Автоматический запуск объявлений отключен"
+        settings.save_to_json()
+        self.speaker_status_bar.setStatusBarText(text=info_message)
 
     def set_play_buttons_disabled(self, disabled: bool = False):
         if disabled:
@@ -315,8 +343,7 @@ class SpeakerApplication(QMainWindow):
         buttons.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action_code=0)
-            if table.is_autoplay:
-                table.set_schedule_autoplay_is_canceled()
+            table.set_schedule_autoplay_is_canceled()
         elif is_error is False and table.__class__.__name__ == 'ScheduleTable':
             table.set_mark_in_cell(table.currentRow(), 1)
             table.set_schedule_is_played()

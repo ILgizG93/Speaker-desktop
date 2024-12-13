@@ -3,23 +3,23 @@ import asyncio
 from datetime import datetime
 
 from typing import Optional
-from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox, QLabel
+from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox, QLabel
 from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent
-from PySide6.QtGui import QColor, QStandardItem, QStandardItemModel
+from PySide6.QtGui import QStandardItem, QStandardItemModel, QWheelEvent, QKeyEvent
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, logger, TableCheckbox
 from .Font import RobotoFont
 
 class ComboBox(QComboBox):
-    def wheelEvent(self, ev):
-        if ev.type() == QEvent.Type.Wheel:
-            ev.ignore()
+    def wheelEvent(self, event: QWheelEvent):
+        if event.type() == QEvent.Type.Wheel:
+            event.ignore()
 
 class TextEdit(QTextEdit):
     enter_pressed_signal: Signal = Signal()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.enter_pressed_signal.emit()
             return
@@ -91,7 +91,7 @@ class ScheduleTable(QTableWidget):
         from UI.SpeakerStatusBar import speaker_status_bar
         self.speaker_status_bar = speaker_status_bar
     
-    async def get_scheduler_data_from_API(self, set_timer: bool = True, flight_id: int = None, audio_text_id: int = None, flight_number: str = None) -> None:
+    async def get_scheduler_data_from_API(self, flight_id: int = None, audio_text_id: int = None, flight_number: str = None) -> None:
         self.timer.stop()
         self.autoplay_timer.stop()
         url_file = QUrl(settings.api_url+'get_scheduler')
@@ -106,9 +106,9 @@ class ScheduleTable(QTableWidget):
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         self.API_manager.get(request)
-        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, set_timer, flight_id, audio_text_id))
+        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, flight_id, audio_text_id))
 
-    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, set_timer: bool, flight_id: int = None, audio_text_id: int = None) -> None:
+    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, flight_id: int = None, audio_text_id: int = None) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 self.schedule_data: list = []
@@ -195,10 +195,9 @@ class ScheduleTable(QTableWidget):
                 error_message = f"Данные не обновлены. Ошибка подключения к API: {result.errorString()}"
                 self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
         
-        if set_timer:
-            self.timer.start()
-            if settings.autoplay:
-                self.autoplay_timer.start()
+        self.timer.start()
+        if settings.autoplay == 1:
+            self.autoplay_timer.start()
 
     def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
         for col_indx, item in enumerate(data):
@@ -274,7 +273,7 @@ class ScheduleTable(QTableWidget):
                     layoutH = QHBoxLayout(widget)
                     layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     text_edit = TextEdit(self)
-                    text_edit.setStyleSheet('QWidget { color: rgb(255, 0, 0); } QWidget::disabled { color: rgb(174, 175, 178) }')
+                    text_edit.setStyleSheet('QWidget { color: rgb(255, 0, 0); text-align: center; } QWidget::disabled { color: rgb(174, 175, 178) }')
                     text_edit.setObjectName(f'{row_indx}_{col_indx}')
                     text_edit.setText(item)
                     text_edit.setFont(self.font.get_font(10))
@@ -416,6 +415,7 @@ class ScheduleTable(QTableWidget):
             'zones': self.get_current_zones(),
             'terminal': self.get_current_terminal(),
             'boarding_gates': self.get_current_boarding_gates(),
+            'autoplay_is_canceled': (None, True)[self.is_autoplay is not True]
         })
         
         reply = self.API_manager.post(request, body.toJson())
