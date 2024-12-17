@@ -3,6 +3,7 @@ import asyncio
 import requests
 import os
 import socket
+from datetime import datetime
 
 import sounddevice as sd
 import soundfile as sf
@@ -10,7 +11,7 @@ from math import ceil
 from functools import partial
 from typing import Optional
 
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QAbstractItemView
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QAbstractItemView, QCheckBox, QFrame
 from PySide6.QtCore import Qt, QTimer, QUrl, QUrlQuery, QSaveFile, QIODevice, QJsonDocument, QSize, Signal
 from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
@@ -80,7 +81,7 @@ class SpeakerApplication(QMainWindow):
         
         self.layout: QHBoxLayout = QHBoxLayout(self.central_widget)
 
-        self.schedule_header = ('', '#', 'Рейс', '', 'План', 'Расч.', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones])
+        self.schedule_header = ('', 'Эфир', 'Рейс', '', 'План', 'Расч.', 'Текст объявления', 'Маршрут', 'РУС', 'ТАТ', 'АНГ', 'Терминал', 'Выход', *[str(zone.get('id')) for zone in self.zones], '')
         self.schedule_data = [(None,) * len(self.schedule_header)]
 
         self.schedule_layout = QVBoxLayout()
@@ -133,6 +134,19 @@ class SpeakerApplication(QMainWindow):
         self.schedule_button_layout.btn_sound_stop.clicked.connect(lambda: self.stop_play(self.schedule_table, self.schedule_button_layout, True))
         self.schedule_button_layout.btn_sound_delete.clicked.connect(partial(self.open_delete_audio_text_dialog, self.schedule_table))
 
+        self.autoplay_checkbox = QCheckBox('Автовоспроизведение')
+        self.autoplay_checkbox.setStyleSheet(
+            "QCheckBox::indicator { width :20px; height : 20px; }" 
+            "QWidget { font-weight: 600; font-size: 16px; }"
+        )
+        self.autoplay_checkbox.setFixedHeight(22)
+        self.autoplay_checkbox.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.autoplay_checkbox.checkStateChanged.connect(self.set_autoplay)
+        self.line = QFrame()
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.schedule_button_layout.addWidget(self.line, 1, 0, 1, 3)
+        self.schedule_button_layout.addWidget(self.autoplay_checkbox, 2, 0)
+
         self.schedule_manipulation_layout = QHBoxLayout()
         self.schedule_manipulation_layout.addLayout(self.schedule_button_layout)
         self.zones_layout = ScheduleZoneLayout(self.zones)
@@ -179,21 +193,36 @@ class SpeakerApplication(QMainWindow):
         self.schedule_table.play_signal.connect(lambda data, table = self.schedule_table, buttons = self.schedule_button_layout: self.save_sound_file(table, buttons, data))
         self.schedule_table.stop_signal.connect(self.get_stop_signal)
         self.schedule_table.error_signal.connect(lambda data, table = self.schedule_table, buttons = self.schedule_button_layout: self.get_error(table, buttons, data))
+        self.schedule_table.autoplay_signal.connect(lambda: asyncio.run(self.start_playing(self.schedule_table, self.schedule_button_layout)))
         self.background_table.play_signal.connect(lambda data, table = self.background_table, buttons = self.background_button_layout: self.save_sound_file(table, buttons, data))
         self.background_table.stop_signal.connect(self.get_stop_signal)
         self.background_table.error_signal.connect(lambda data, table = self.background_table, buttons = self.background_button_layout: self.get_error(table, buttons, data))
 
         from .SpeakerStatusBar import speaker_status_bar
+        self.speaker_status_bar = speaker_status_bar
         self.setStatusBar(speaker_status_bar)
         self.statusBar().setStyleSheet("font-size: 16px")
 
-        from datetime import datetime
         self.current_time_timer = QTimer()
         self.current_time_timer.setInterval(.8*1000)
         self.current_time_timer.timeout.connect(lambda: self.time_label.setText(datetime.now().strftime('%d.%m.%Y %H:%M')))
         self.current_time_timer.start()
+        
+        self.autoplay_checkbox.setChecked(settings.autoplay)
 
         self.schedule_table.setFocus()
+    
+    def set_autoplay(self):
+        self.schedule_table.autoplay_timer.stop()
+        if self.sender().checkState() == Qt.CheckState.Checked:
+            settings.autoplay = 1
+            self.schedule_table.autoplay_timer.start()
+            info_message = "Автоматический запуск объявлений включен"
+        else:
+            settings.autoplay = 0
+            info_message = "Автоматический запуск объявлений отключен"
+        settings.save_to_json()
+        self.speaker_status_bar.setStatusBarText(text=info_message)
 
     def set_play_buttons_disabled(self, disabled: bool = False):
         if disabled:
@@ -209,9 +238,10 @@ class SpeakerApplication(QMainWindow):
         self.flight_number_search_cancel_btn.setVisible(True)
         find_count: int = 0
         for row_indx in range(self.schedule_table.rowCount()):
-            if flight_number in self.schedule_table.item(row_indx, 1).text():
+            flight_item: QLabel = self.schedule_table.cellWidget(row_indx, 2)
+            if flight_number in flight_item.text():
                 if find_count == 0:
-                    current_index = self.schedule_table.model().index(row_indx, 1)
+                    current_index = self.schedule_table.model().index(row_indx, 2)
                     self.schedule_table.selectRow(row_indx)
                     self.schedule_table.scrollTo(current_index, QAbstractItemView.ScrollHint.PositionAtTop)
                 find_count += 1
@@ -219,7 +249,6 @@ class SpeakerApplication(QMainWindow):
             error_message: str = "Рейс не найден."
             self.open_message_dialog(error_message)
             return
-        print(f"find {find_count} records.")
         self.schedule_table.setFocus()
 
     def stop_flight_searching(self):
@@ -232,6 +261,7 @@ class SpeakerApplication(QMainWindow):
         buttons.btn_sound_play.setHidden(True)
         buttons.btn_sound_stop.setVisible(True)
         buttons.btn_sound_stop.setDisabled(True)
+        self.schedule_table.autoplay_timer.stop()
         await table.get_audio_file()
     
     def get_error(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, error_message: str) -> None:
@@ -267,7 +297,8 @@ class SpeakerApplication(QMainWindow):
             'terminal': table.get_current_terminal(),
             'boarding_gates': table.get_current_boarding_gates(),
             'action_code': action_code,
-            'ipv4': socket.gethostbyname(socket.gethostname())
+            'ipv4': socket.gethostbyname(socket.gethostname()),
+            'is_autoplay': table.is_autoplay
         })
         request = QtNetwork.QNetworkRequest(url_file)
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
@@ -278,8 +309,8 @@ class SpeakerApplication(QMainWindow):
         table.setDisabled(True)
         buttons.btn_sound_delete.setDisabled(True)
 
-        file = sf.SoundFile(table.current_sound_file)
-        duration = ceil(file.frames / file.samplerate) * 1_000
+        file_info = sf.info(table.current_sound_file)
+        duration = ceil(file_info.duration) * 1_000 + 500
         
         data, _ = sf.read(table.current_sound_file)
         sd.default.device = self.device_id
@@ -306,17 +337,22 @@ class SpeakerApplication(QMainWindow):
         table.setEnabled(True)
         buttons.btn_sound_delete.setEnabled(True)
         table.timer.start()
+        if settings.autoplay and self.schedule_table.autoplay_timer:
+            self.schedule_table.autoplay_timer.start()
         self.play_finish_timer.stop()
         buttons.btn_sound_play.setVisible(True)
         buttons.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action_code=0)
+            self.schedule_table.set_schedule_autoplay_is_canceled()
         elif is_error is False and table.__class__.__name__ == 'ScheduleTable':
             table.set_mark_in_cell(table.currentRow(), 1)
             table.set_schedule_is_played()
+        table.is_autoplay = False
 
     def open_audio_text_dialog(self) -> None:
         self.schedule_table.timer.stop()
+        self.schedule_table.autoplay_timer.stop()
         flight_id, _ = map(int, self.schedule_table.get_current_row_id().split('_'))
         self.audio_text_dialog = AudioTextDialog(self)
         self.audio_text_dialog.flight_combobox_model.clear()
@@ -336,6 +372,8 @@ class SpeakerApplication(QMainWindow):
                 asyncio.run(self.schedule_table.get_scheduler_data_from_API(flight_id=reply_body.get('flight_id'), audio_text_id=reply_body.get('audio_text_id')))
             self.open_message_dialog(reply_message)
         self.schedule_table.timer.start()
+        if settings.autoplay:
+            self.schedule_table.autoplay_timer.start()
 
     def open_delete_audio_text_dialog(self, table: ScheduleTable | BackgroundTable) -> None:
         match table.__class__.__name__:
@@ -352,6 +390,8 @@ class SpeakerApplication(QMainWindow):
             self.open_message_dialog(error_message)
             return
         table.timer.stop()
+        if table.autoplay_timer:
+            table.autoplay_timer.stop()
         table.current_data = table.get_current_row_data(row_id)
         self.delete_audio_text_dialog.data = table.data_origin
         self.delete_audio_text_dialog.set_message_text(table.current_data)
@@ -379,6 +419,8 @@ class SpeakerApplication(QMainWindow):
                     self.open_message_dialog(error_message)
 
         table.timer.start()
+        if settings.autoplay and table.autoplay_timer:
+            table.autoplay_timer.start()
         self.delete_audio_text_dialog.destroy()
     
     async def get_terminal_data_from_API(self) -> None:

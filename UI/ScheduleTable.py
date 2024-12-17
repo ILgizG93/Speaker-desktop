@@ -1,24 +1,25 @@
 import json
 import asyncio
+from datetime import datetime
 
 from typing import Optional
-from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QTableWidgetItem, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox
+from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox, QLabel
 from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent
-from PySide6.QtGui import QColor, QStandardItem, QStandardItemModel, QFont
+from PySide6.QtGui import QStandardItem, QStandardItemModel, QWheelEvent, QKeyEvent
 from PySide6 import QtNetwork
 
 from globals import root_directory, settings, logger, TableCheckbox
 from .Font import RobotoFont
 
 class ComboBox(QComboBox):
-    def wheelEvent(self, ev):
-        if ev.type() == QEvent.Type.Wheel:
-            ev.ignore()
+    def wheelEvent(self, event: QWheelEvent):
+        if event.type() == QEvent.Type.Wheel:
+            event.ignore()
 
 class TextEdit(QTextEdit):
     enter_pressed_signal: Signal = Signal()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.enter_pressed_signal.emit()
             return
@@ -32,6 +33,9 @@ class ScheduleTable(QTableWidget):
     play_signal: Signal = Signal(QtNetwork.QNetworkReply)
     stop_signal: Signal = Signal(tuple)
     error_signal: Signal = Signal(str)
+    autoplay_signal: Signal = Signal()
+    autoplay_files: dict = []
+    is_autoplay: bool = False
 
     def __init__(self, header: tuple[str], zones: dict, parent=None) -> None:
         self.header: tuple[str] = header
@@ -42,24 +46,28 @@ class ScheduleTable(QTableWidget):
 
         self.font: RobotoFont = RobotoFont()
 
-        # self.setAlternatingRowColors(True)
+        self.setAlternatingRowColors(True)
         self.setMinimumWidth(500)
         self.verticalHeader().setHidden(True)
         
         self.setHorizontalHeaderLabels(self.header)
         self.setColumnHidden(0, True)
+        self.setColumnHidden(len(self.header)-1, True)
         self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-        self.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
-        self.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        self.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)
+        self.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(6, QHeaderView.ResizeMode.Stretch)
         self.horizontalHeader().setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(8, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(9, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(10, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(11, QHeaderView.ResizeMode.ResizeToContents)
-        self.setColumnWidth(1, 32)
+        self.horizontalHeader().setSectionResizeMode(12, QHeaderView.ResizeMode.ResizeToContents)
+        self.setColumnWidth(1, 50)
+        self.setColumnWidth(4, 50)
+        self.setColumnWidth(5, 50)
         self.setColumnWidth(7, 220)
         self.setColumnWidth(8, 32)
         self.setColumnWidth(9, 32)
@@ -76,11 +84,16 @@ class ScheduleTable(QTableWidget):
         self.timer.setInterval(settings.schedule_update_time*1000)
         self.timer.timeout.connect(lambda: asyncio.run(self.get_scheduler_data_from_API()))
 
+        self.autoplay_timer = QTimer()
+        self.autoplay_timer.setInterval(10000)
+        self.autoplay_timer.timeout.connect(self.start_autoplay)
+
         from UI.SpeakerStatusBar import speaker_status_bar
         self.speaker_status_bar = speaker_status_bar
     
-    async def get_scheduler_data_from_API(self, set_timer: bool = True, flight_id: int = None, audio_text_id: int = None, flight_number: str = None) -> None:
+    async def get_scheduler_data_from_API(self, flight_id: int = None, audio_text_id: int = None, flight_number: str = None) -> None:
         self.timer.stop()
+        self.autoplay_timer.stop()
         url_file = QUrl(settings.api_url+'get_scheduler')
         query = QUrlQuery()
         if flight_id and audio_text_id:
@@ -93,9 +106,9 @@ class ScheduleTable(QTableWidget):
         request = QtNetwork.QNetworkRequest(url_file)
         self.API_manager = QtNetwork.QNetworkAccessManager()
         self.API_manager.get(request)
-        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, set_timer, flight_id, audio_text_id))
+        self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, flight_id, audio_text_id))
 
-    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, set_timer: bool, flight_id: int = None, audio_text_id: int = None) -> None:
+    def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, flight_id: int = None, audio_text_id: int = None) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 self.schedule_data: list = []
@@ -109,7 +122,7 @@ class ScheduleTable(QTableWidget):
                         row_indx: int = 0
                         if is_has_row_in_table is not True:
                             self.data_origin.append(received_data)
-                            self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
+                            self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('flight_datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
                         for indx, data in enumerate(self.data_origin):
                             if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
                                 current_schedule: list = [data]
@@ -118,6 +131,7 @@ class ScheduleTable(QTableWidget):
                         self.data_origin[row_indx]['event_time'] = received_data.get('event_time')
                         received_data: list[dict] = [self.data_origin[row_indx]]
                     else:
+                        self.autoplay_files = {}
                         self.data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
                         received_data: list[dict] = self.data_origin
                     for data in received_data:
@@ -128,15 +142,31 @@ class ScheduleTable(QTableWidget):
                         if data.get('event_time'):
                             audio_text += f" ({data.get('event_time')})"
                         self.schedule_data.append((
-                            data.get('schedule_id'), data.get('is_played'), data.get('flight_number_full'), data.get('direction'), data.get('plan_flight_time'), data.get('public_flight_time'), 
-                            audio_text, data.get('airport'),
-                            data.get('languages').get('RUS').get('display'),
+                            data.get('schedule_id'), 
+                            (data.get('is_played'), data.get('job_time'), data.get('job_is_fact')), 
+                            data.get('flight_number_full'), 
+                            data.get('direction'), 
+                            data.get('plan_flight_time'), 
+                            data.get('public_flight_time'), 
+                            audio_text, 
+                            data.get('airport'),
+                            data.get('languages').get('RUS').get('display'), 
                             data.get('languages').get('TAT').get('display'),
                             data.get('languages').get('ENG').get('display'), 
                             data.get('terminal'), data.get('boarding_gates'),
                             *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
-                            data.get('direction_id')
+                            (data.get('direction_id'), data.get('status_id'))
                         ))
+                        if data.get('job_time'):
+                            self.autoplay_files[data.get('schedule_id')] = self.autoplay_files.get(data.get('schedule_id'), {
+                                'job_id': data.get('job_id'),
+                                'job_time': data.get('job_time'),
+                                'job_datetime': data.get('job_datetime'),
+                                'job_is_fact': data.get('job_is_fact'),
+                                'is_played': data.get('is_played'),
+                                'autoplay_is_canceled': data.get('autoplay_is_canceled')
+                            })
+                    self.autoplay_files = dict(sorted(self.autoplay_files.items(), key=lambda value: list(value[1].values())[2]))
                     if flight_id and audio_text_id:
                         if is_has_row_in_table is not True:
                             self.insertRow(row_indx)
@@ -165,25 +195,36 @@ class ScheduleTable(QTableWidget):
                 error_message = f"Данные не обновлены. Ошибка подключения к API: {result.errorString()}"
                 self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
         
-        if set_timer:
-            self.timer.start()
+        self.timer.start()
+        if settings.autoplay == 1:
+            self.autoplay_timer.start()
 
     def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
         for col_indx, item in enumerate(data):
             if col_indx in [1]:
-                element = QTableWidgetItem(str(row_indx+1))
+                is_played, job_time, job_is_fact = item
+                element = QLabel(job_time)
                 element.setFont(self.font.get_font())
-                element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                self.setItem(row_indx, col_indx, element)
-                cell = self.item(row_indx, col_indx)
-                cell.setBackground((QColor(92, 184, 92), QColor(240, 240, 240))[item is None])
-                cell.setFont(QFont("Roboto", weight=QFont.Weight.Bold))
-                cell.setFlags(Qt.ItemFlag.ItemIsEnabled)
+                element.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.setCellWidget(row_indx, col_indx, element)
+                cell = self.cellWidget(row_indx, col_indx)
+                job_fact_style: str = ('color: rgb(88, 176, 64); font-weight: 600;', 'color: rgb(0, 0, 0);')[job_is_fact is None or is_played is True]
+                cell.setStyleSheet((
+                    'QWidget { border-top: 1px 0px solid white; text-align: center; border-radius: 0px; background-color: rgb(92, 184, 92); '+job_fact_style+' }  QWidget::disabled { color: rgb(174, 175, 178) }', 
+                    'QWidget { border-top: 1px 0px solid white; text-align: center; border-radius: 0px; background-color: rgb(250, 250, 250); '+job_fact_style+' }  QWidget::disabled { color: rgb(174, 175, 178) }'
+                )[is_played is None])
+            elif col_indx in [2]:
+                element = QLabel(item)
+                element.setFont(self.font.get_font())
+                self.setCellWidget(row_indx, col_indx, element)
+                if data[-1][1] == 10:
+                    cell = self.cellWidget(row_indx, col_indx)
+                    cell.setStyleSheet('QWidget { color: rgb(255, 25, 25); } QWidget::disabled { color: rgb(174, 175, 178) }')
             elif col_indx in [3,4]:
-                element = QTableWidgetItem(item)
+                element = QLabel(item)
                 element.setFont(self.font.get_font())
-                element.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                self.setItem(row_indx, col_indx, element)
+                element.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.setCellWidget(row_indx, col_indx, element)
             elif col_indx in [i for i in range(13, 12+len(self.zones)+1)]:
                 widget = QWidget()
                 checkbox = TableCheckbox(row_indx, col_indx)
@@ -228,10 +269,11 @@ class ScheduleTable(QTableWidget):
                 self.setCellWidget(row_indx, col_indx, widget)
             elif col_indx in [12]:
                 widget = QWidget()
-                if data[-1] == 1:
+                if data[-1][0] == 1:
                     layoutH = QHBoxLayout(widget)
                     layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     text_edit = TextEdit(self)
+                    text_edit.setStyleSheet('QWidget { color: rgb(255, 0, 0); text-align: center; } QWidget::disabled { color: rgb(174, 175, 178) }')
                     text_edit.setObjectName(f'{row_indx}_{col_indx}')
                     text_edit.setText(item)
                     text_edit.setFont(self.font.get_font(10))
@@ -240,23 +282,25 @@ class ScheduleTable(QTableWidget):
                     text_edit.selectionChanged.connect(self.select_current_row)
                     layoutH.addWidget(text_edit)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx >= 17:
+            elif col_indx >= len(self.header)-1:
                 ...
             else:
-                element = QTableWidgetItem(item)
+                element = QLabel(item)
                 element.setFont(self.font.get_font())
+                element.setWordWrap(True)
                 if col_indx in [5]:
-                    element.setForeground(QColor(255, 25, 25))
-                if col_indx in [6] and data[-1] == 2:
-                    element.setForeground(QColor(50, 100, 255))
-                self.setItem(row_indx, col_indx, element)
-
+                    element.setStyleSheet('QWidget { color: rgb(255, 25, 25) } QWidget::disabled { color: rgb(174, 175, 178) } ')
+                if col_indx in [6] and data[-1][0] == 2:
+                    element.setStyleSheet('QWidget { color: rgb(50, 100, 255) } QWidget::disabled { color: rgb(174, 175, 178) } ')
+                self.setCellWidget(row_indx, col_indx, element)
+    
     def set_mark_in_cell(self, row_indx: int, col_indx: int):
-        self.item(row_indx, col_indx).setBackground(QColor(60, 150, 35))
+        self.cellWidget(row_indx, col_indx).setStyleSheet('QWidget { background-color: rgb(92, 184, 92); border-radius: 0px; }')
 
     def get_current_row_id(self) -> str:
         try:
-            row_id = self.item(self.currentRow(), 0).text()
+            cell: QLabel = self.cellWidget(self.currentRow(), 0)
+            row_id = cell.text()
         except AttributeError as err:
             return None
         return row_id
@@ -273,7 +317,7 @@ class ScheduleTable(QTableWidget):
     def get_current_zones(self) -> list[int]:
         current_zones: list[int] = []
         row: int = self.currentRow()
-        for i in range(self.col_count - len(self.zones), self.col_count):
+        for i in range(self.col_count - len(self.zones)-1, self.col_count-1):
             checkbox: QCheckBox = self.cellWidget(row,i).findChild(QCheckBox)
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-12)
@@ -298,6 +342,11 @@ class ScheduleTable(QTableWidget):
         elif self.data_origin:
             return self.data_origin[0]
     
+    def get_current_autoplay_file(self, row_id: str) -> dict:
+        for key, value in self.autoplay_files.items():
+            if row_id == key:
+                return value
+    
     def set_active_schedule_id(self) -> None:
         self.current_data = self.get_current_row_data(self.get_current_row_id())
         if self.current_data:
@@ -320,9 +369,9 @@ class ScheduleTable(QTableWidget):
             self.selectRow(0)
     
     def sound_data_check(self) -> Optional[str]:
-        if not self.current_data.get('terminal'):
+        if self.current_data.get('is_has_terminal') and not self.current_data.get('terminal'):
             return 'Терминал'
-        if int(self.current_data.get('direction_id')) == 1 and not self.current_data.get('boarding_gates'):
+        if self.current_data.get('is_has_boarding_gate') and int(self.current_data.get('direction_id')) == 1 and not self.current_data.get('boarding_gates'):
             return 'Номер выхода'
         return False
 
@@ -365,6 +414,7 @@ class ScheduleTable(QTableWidget):
             'zones': self.get_current_zones(),
             'terminal': self.get_current_terminal(),
             'boarding_gates': self.get_current_boarding_gates(),
+            'autoplay_is_canceled': (None, True)[self.is_autoplay is not True]
         })
         
         reply = self.API_manager.post(request, body.toJson())
@@ -391,6 +441,7 @@ class ScheduleTable(QTableWidget):
 
     def set_schedule_is_played(self) -> None:
         self.current_data = self.get_current_row_data(self.get_current_row_id())
+        self.remove_from_autoplay(self.current_data.get('schedule_id'))
         url_file = QUrl(settings.api_url+'set_schedule_is_played')
         request = QtNetwork.QNetworkRequest(url_file)
         request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
@@ -401,6 +452,19 @@ class ScheduleTable(QTableWidget):
         })
         self.API_post.post(request, body.toJson())
         self.API_post.finished.connect(self.after_update_schedule)
+
+    def set_schedule_autoplay_is_canceled(self) -> None:
+        self.current_data = self.get_current_row_data(self.get_current_row_id())
+        self.remove_from_autoplay(self.current_data.get('schedule_id'))
+        url_file = QUrl(settings.api_url+'set_schedule_autoplay_is_canceled')
+        request = QtNetwork.QNetworkRequest(url_file)
+        request.setHeader(QtNetwork.QNetworkRequest.KnownHeaders.ContentTypeHeader, "application/json")
+        self.API_post = QtNetwork.QNetworkAccessManager()
+        body = QJsonDocument({
+            'flight_id': self.current_data.get('flight_id'),
+            'audio_text_id': self.current_data.get('audio_text_id')
+        })
+        self.API_post.post(request, body.toJson())
 
     def after_update_schedule(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
@@ -418,16 +482,15 @@ class ScheduleTable(QTableWidget):
         audio_text_id: int = self.current_data.get('audio_text_id')
         current_row_number = self.currentRow()
         for row in reversed(range(self.model().rowCount())):
-            indx = self.model().index(row, 0)
-            if indx.data():
-                row_flight_id, row_audio_text_id = map(int, indx.data().split('_'))
+            if schedule_id := self.indexWidget(self.model().index(row, 0)).text():
+                row_flight_id, row_audio_text_id = map(int, schedule_id.split('_'))
                 if (row_flight_id == flight_id and delete_all_audio is True) or (row_flight_id == flight_id and row_audio_text_id == audio_text_id):
                     self.data_origin.pop(row)
                     self.removeRow(row)
                 self.selectRow(current_row_number)
             else:
                 break
-        
+
     def select_current_row(self) -> None:
         row, column = map(int, self.sender().objectName().split('_'))
         self.selectRow(row)
@@ -436,3 +499,25 @@ class ScheduleTable(QTableWidget):
         row, column = map(int, self.sender().objectName().split('_'))
         self.selectRow(row)
         self.update_schedule()
+    
+    def start_autoplay(self):
+        for key, value in self.autoplay_files.items(): 
+            if value.get('autoplay_is_canceled') is not True and value.get('is_played') is not True and value.get('job_is_fact') is True and datetime.now() >= datetime.strptime(value.get('job_datetime'), '%Y-%m-%d %H:%M'):
+                row_indx = self.flight_searching_autoplay(key)
+                if row_indx is not None:
+                    self.autoplay_timer.stop()
+                    self.is_autoplay = True
+                    self.autoplay_signal.emit()
+                    return
+
+    def flight_searching_autoplay(self, schedule_id: str) -> int:
+        for row_indx in range(self.rowCount()):
+            schedule = self.cellWidget(row_indx, 0)
+            if schedule.text() == schedule_id:
+                current_index = self.model().index(row_indx, 2)
+                self.selectRow(row_indx)
+                self.scrollTo(current_index, QAbstractItemView.ScrollHint.PositionAtTop)
+                return row_indx
+    
+    def remove_from_autoplay(self, schedule_id: str):
+        self.autoplay_files.pop(schedule_id, None)

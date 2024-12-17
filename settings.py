@@ -18,6 +18,7 @@ class SpeakerSetting():
         self.log_file_path: str
         self.file_name: str
         self.file_format: str
+        self.autoplay: int
         
         if os.path.isfile(SETTINGS_FILE_NAME):
             self.load_from_json()
@@ -47,7 +48,8 @@ class SpeakerSetting():
                 'api_url': self.api_url,
                 'log_file_path': self.log_file_path,
                 'file_name': self.file_name,
-                'file_format': self.file_format
+                'file_format': self.file_format,
+                'autoplay': self.autoplay
             }
             json.dump(data, json_file, ensure_ascii=False, indent=4)
 
