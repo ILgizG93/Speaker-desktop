@@ -261,6 +261,7 @@ class SpeakerApplication(QMainWindow):
         buttons.btn_sound_play.setHidden(True)
         buttons.btn_sound_stop.setVisible(True)
         buttons.btn_sound_stop.setDisabled(True)
+        self.schedule_table.autoplay_timer.stop()
         await table.get_audio_file()
     
     def get_error(self, table: ScheduleTable | BackgroundTable, buttons: PlayerButtonLayout, error_message: str) -> None:
@@ -336,14 +337,14 @@ class SpeakerApplication(QMainWindow):
         table.setEnabled(True)
         buttons.btn_sound_delete.setEnabled(True)
         table.timer.start()
-        if settings.autoplay and table.autoplay_timer:
-            table.autoplay_timer.start()
+        if settings.autoplay and self.schedule_table.autoplay_timer:
+            self.schedule_table.autoplay_timer.start()
         self.play_finish_timer.stop()
         buttons.btn_sound_play.setVisible(True)
         buttons.btn_sound_stop.setHidden(True)
         if is_manual_pressed:
             self.save_action_history(user_uuid=self.user_uuid, table=table, action_code=0)
-            table.set_schedule_autoplay_is_canceled()
+            self.schedule_table.set_schedule_autoplay_is_canceled()
         elif is_error is False and table.__class__.__name__ == 'ScheduleTable':
             table.set_mark_in_cell(table.currentRow(), 1)
             table.set_schedule_is_played()

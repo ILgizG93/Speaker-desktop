@@ -399,7 +399,6 @@ class ScheduleTable(QTableWidget):
             return
 
         self.timer.stop()
-        self.autoplay_timer.stop()
 
         url_file = QUrl(settings.api_url+'get_scheduler_sound')
         query = QUrlQuery()
