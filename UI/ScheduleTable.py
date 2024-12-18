@@ -68,7 +68,7 @@ class ScheduleTable(QTableWidget):
         self.setColumnWidth(1, 50)
         self.setColumnWidth(4, 50)
         self.setColumnWidth(5, 50)
-        self.setColumnWidth(7, 220)
+        self.setColumnWidth(7, 240)
         self.setColumnWidth(8, 32)
         self.setColumnWidth(9, 32)
         self.setColumnWidth(10, 32)
@@ -149,7 +149,7 @@ class ScheduleTable(QTableWidget):
                             data.get('plan_flight_time'), 
                             data.get('public_flight_time'), 
                             audio_text, 
-                            data.get('airport'),
+                            data.get('path'),
                             data.get('languages').get('RUS').get('display'), 
                             data.get('languages').get('TAT').get('display'),
                             data.get('languages').get('ENG').get('display'), 
