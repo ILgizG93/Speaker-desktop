@@ -132,12 +132,11 @@ class AudioTextDialog(QDialog):
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
-                self.flight_data_origin = json.loads(str(bytes_string, 'utf-8'))
+                self.flight_data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
                 # item = QStandardItem("Вне рейса")
                 # item.setData({'direction_id': None})
                 # self.flight_combobox_model.appendRow(item)
                 for flight in self.flight_data_origin:
-                    flight: dict
                     item = QStandardItem(f"{flight.get('plan_flight_time')}     {flight.get('flight_number_full')}")
                     item.setData(flight)
                     self.flight_combobox_model.appendRow(item)
