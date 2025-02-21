@@ -1,50 +1,78 @@
-import operator
-from PySide6.QtCore import Qt, QAbstractTableModel, SIGNAL
+from PySide6.QtCore import Qt, QAbstractTableModel
 
 class TableModel(QAbstractTableModel):
-    def __init__(self, parent, header, data=[], *args):
-        QAbstractTableModel.__init__(self, parent, *args)
-        self._header = header
+    def __init__(self, parent, header, data = [], centered_columns = [], checkable_columns=None, combobox_columns=None, editable_columns=None) -> None:
+        super().__init__(parent)
         self._data = data
+        self._header = header
+        self._centered_columns = centered_columns
+        if checkable_columns is None:
+            checkable_columns = []
+        elif isinstance(checkable_columns, int):
+            checkable_columns = [checkable_columns]
+        self._checkable_columns = set(checkable_columns)
+        if combobox_columns is None:
+            combobox_columns = []
+        elif isinstance(combobox_columns, int):
+            combobox_columns = [combobox_columns]
+        self._combobox_columns = set(combobox_columns)
+        if editable_columns is None:
+            editable_columns = []
+        elif isinstance(editable_columns, int):
+            editable_columns = [editable_columns]
+        self._editable_columns = set(editable_columns)
 
-    def setItems(self, items):
-        self.beginResetModel()
-        self._data = items
-        self.endResetModel()
+    def setColumnCheckable(self, column, checkable=True) -> None:
+        if checkable:
+            self._checkable_columns.add(column)
+        else:
+            self._checkable_columns.discard(column)
+        self.dataChanged.emit(self.index(0, column), self.index(self.rowCount() - 1, column))
 
-    def rowCount(self, parent=None):
-        return (0, len(self._data))[self._data is not None]
-    
-    def columnCount(self, parent=None):
-        return (0, len(self._header))[len(self._header) > 0]
+    def rowCount(self, index) -> int:
+        return len(self._data)
+
+    def columnCount(self, index) -> int:
+        return len(self._header)
+
+    def flags(self, index):
+        flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
+        if index.column() in self._checkable_columns:
+            flags |= Qt.ItemFlag.ItemIsUserCheckable
+        if index.column() in [set(self._editable_columns) | set(self._combobox_columns)]:
+            flags |= Qt.ItemFlag.ItemIsEditable
+        return flags
+
+    def data(self, index, role):
+        if not index.isValid():
+           return None
+        if role == Qt.ItemDataRole.CheckStateRole and index.column() in self._checkable_columns:
+            value = self._data[index.row()][index.column()]
+            return Qt.CheckState.Checked if value else Qt.CheckState.Unchecked
+        elif index.column() not in (self._checkable_columns) and index.column() not in (5,) and role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
+            return self._data[index.row()][index.column()]
+        elif role == Qt.ItemDataRole.TextAlignmentRole and index.column() in self._centered_columns:
+            return Qt.AlignmentFlag.AlignCenter
+        elif role == Qt.ItemDataRole.DecorationRole and index.column() in self._checkable_columns:
+            return Qt.CursorShape.PointingHandCursor
     
     def headerData(self, col, orientation, role):
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
             return self._header[col]
-    
-    def data(self, index, role):
-        if not index.isValid():
-            return None
-        elif role == Qt.ItemDataRole.DisplayRole:
-            return self._data[index.row()][index.column()]
+        return None
 
-    def insertRows(self, position, rows, QModelIndex, parent):
-        self.beginResetModel()
-        default_row = ['']*len(self._header)
-        [self._data.insert(position, default_row) for _ in range(rows)]
-        self.endResetModel()
+    def setData(self, index, value, role = Qt.ItemDataRole.EditRole) -> bool:
+        if (role == Qt.ItemDataRole.CheckStateRole and index.column() in self._checkable_columns):
+                self._data[index.row()][index.column()] = bool(value)
+                self.dataChanged.emit(index, index)
+                return True
+        if value is not None and role == Qt.ItemDataRole.EditRole:
+            self._data[index.row()][index.column()] = value
+            self.dataChanged.emit(index, index)
+            return True
+        return False
 
-    def removeRows(self, position, rows):
+    def setItems(self, items) -> None:
         self.beginResetModel()
-        for _ in range(rows):
-            del(self._data[position])
+        self._data = items
         self.endResetModel()
-    
-    def sort(self, col, order):
-        global current_sort
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        self._data = sorted(self._data, key=operator.itemgetter(col))
-        if order == Qt.SortOrder.DescendingOrder:
-            self._data.reverse()
-        self.emit(SIGNAL("layoutChanged()"))
-        current_sort = [col, order]
