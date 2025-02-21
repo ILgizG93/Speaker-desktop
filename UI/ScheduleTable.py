@@ -109,97 +109,103 @@ class ScheduleTable(QTableWidget):
         self.API_manager.finished.connect(lambda reply: self.refresh_schedule_table(reply, flight_id, audio_text_id))
 
     def refresh_schedule_table(self, result: QtNetwork.QNetworkReply, flight_id: int = None, audio_text_id: int = None) -> None:
-        match result.error():
-            case QtNetwork.QNetworkReply.NetworkError.NoError:
-                self.schedule_data: list = []
-                bytes_string = result.readAll()
-                if len(str(bytes_string, 'utf-8')) == 0:
-                    self.setRowCount(0)
-                else:
-                    if flight_id and audio_text_id:
-                        received_data: dict = json.loads(str(bytes_string, 'utf-8'))[0]
-                        is_has_row_in_table: bool = len(list(filter(lambda d: d.get('flight_id') == flight_id and d.get('audio_text_id') == audio_text_id, self.data_origin))) != 0                       
-                        row_indx: int = 0
-                        if is_has_row_in_table is not True:
-                            self.data_origin.append(received_data)
-                            self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('flight_datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
-                        for indx, data in enumerate(self.data_origin):
-                            if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
-                                current_schedule: list = [data]
-                                row_indx = indx
-                                break
-                        self.data_origin[row_indx]['event_time'] = received_data.get('event_time')
-                        received_data: list[dict] = [self.data_origin[row_indx]]
+        self.blockSignals(True)
+        self.setUpdatesEnabled(False)
+        try:
+            match result.error():
+                case QtNetwork.QNetworkReply.NetworkError.NoError:
+                    self.schedule_data: list = []
+                    bytes_string = result.readAll()
+                    if len(str(bytes_string, 'utf-8')) == 0:
+                        self.setRowCount(0)
                     else:
-                        self.autoplay_files = {}
-                        self.data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
-                        received_data: list[dict] = self.data_origin
-                    for data in received_data:
-                        if data.get('audio_text_description'):
-                            audio_text = f"{data.get('audio_text')} ({data.get('audio_text_description')})"
+                        if flight_id and audio_text_id:
+                            received_data: dict = json.loads(str(bytes_string, 'utf-8'))[0]
+                            is_has_row_in_table: bool = len(list(filter(lambda d: d.get('flight_id') == flight_id and d.get('audio_text_id') == audio_text_id, self.data_origin))) != 0                       
+                            row_indx: int = 0
+                            if is_has_row_in_table is not True:
+                                self.data_origin.append(received_data)
+                                self.data_origin = list(sorted(self.data_origin, key=lambda d: (d.get('flight_datetime'), d.get('flight_id'), (d.get('queue') is None, d.get('queue') or 0) , d.get('schedule_id'))))
+                            for indx, data in enumerate(self.data_origin):
+                                if data.get('flight_id') == flight_id and data.get('audio_text_id') == audio_text_id:
+                                    current_schedule: list = [data]
+                                    row_indx = indx
+                                    break
+                            self.data_origin[row_indx]['event_time'] = received_data.get('event_time')
+                            received_data: list[dict] = [self.data_origin[row_indx]]
                         else:
-                            audio_text = f"{data.get('audio_text')}"
-                        if data.get('event_time'):
-                            audio_text += f" ({data.get('event_time')})"
-                        self.schedule_data.append((
-                            data.get('schedule_id'), 
-                            (data.get('is_played'), data.get('job_time'), data.get('job_is_fact')), 
-                            data.get('flight_number_full'), 
-                            data.get('direction'), 
-                            data.get('plan_flight_time'), 
-                            data.get('public_flight_time'), 
-                            audio_text, 
-                            data.get('path'),
-                            data.get('languages').get('RUS').get('display'), 
-                            data.get('languages').get('TAT').get('display'),
-                            data.get('languages').get('ENG').get('display'), 
-                            data.get('terminal'), data.get('boarding_gates'),
-                            *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
-                            (data.get('direction_id'), data.get('status_id'))
-                        ))
-                        if data.get('job_time'):
-                            self.autoplay_files[data.get('schedule_id')] = self.autoplay_files.get(data.get('schedule_id'), {
-                                'job_id': data.get('job_id'),
-                                'job_time': data.get('job_time'),
-                                'job_datetime': data.get('job_datetime'),
-                                'job_is_fact': data.get('job_is_fact'),
-                                'is_played': data.get('is_played'),
-                                'autoplay_is_canceled': data.get('autoplay_is_canceled')
-                            })
-                    self.autoplay_files = dict(sorted(self.autoplay_files.items(), key=lambda value: list(value[1].values())[2]))
-                    if flight_id and audio_text_id:
-                        if is_has_row_in_table is not True:
-                            self.insertRow(row_indx)
-                        self.set_row_data(row_indx, self.schedule_data[0], received_data[0])
-                        self.resizeRowToContents(row_indx)
-                        self.selectRow(row_indx)
-                    else:
-                        if (len(self.schedule_data) == 0):
-                            self.schedule_data = [(None,) * len(self.header)]
-                            self.setRowCount(0)
+                            self.autoplay_files = {}
+                            self.data_origin: list[dict] = json.loads(str(bytes_string, 'utf-8'))
+                            received_data: list[dict] = self.data_origin
+                        for data in received_data:
+                            if data.get('audio_text_description'):
+                                audio_text = f"{data.get('audio_text')} ({data.get('audio_text_description')})"
+                            else:
+                                audio_text = f"{data.get('audio_text')}"
+                            if data.get('event_time'):
+                                audio_text += f" ({data.get('event_time')})"
+                            self.schedule_data.append((
+                                data.get('schedule_id'), 
+                                (data.get('is_played'), data.get('job_time'), data.get('job_is_fact')), 
+                                data.get('flight_number_full'), 
+                                data.get('direction'), 
+                                data.get('plan_flight_time'), 
+                                data.get('public_flight_time'), 
+                                audio_text, 
+                                data.get('path'),
+                                data.get('languages').get('RUS').get('display'), 
+                                data.get('languages').get('TAT').get('display'),
+                                data.get('languages').get('ENG').get('display'), 
+                                data.get('terminal'), data.get('boarding_gates'),
+                                *list(map(lambda i: True if i[0]+1 in data.get('zones_list') else False, enumerate(self.zones))),
+                                (data.get('direction_id'), data.get('status_id'))
+                            ))
+                            if data.get('job_time'):
+                                self.autoplay_files[data.get('schedule_id')] = self.autoplay_files.get(data.get('schedule_id'), {
+                                    'job_id': data.get('job_id'),
+                                    'job_time': data.get('job_time'),
+                                    'job_datetime': data.get('job_datetime'),
+                                    'job_is_fact': data.get('job_is_fact'),
+                                    'is_played': data.get('is_played'),
+                                    'autoplay_is_canceled': data.get('autoplay_is_canceled')
+                                })
+                        self.autoplay_files = dict(sorted(self.autoplay_files.items(), key=lambda value: list(value[1].values())[2]))
+                        if flight_id and audio_text_id:
+                            if is_has_row_in_table is not True:
+                                self.insertRow(row_indx)
+                            self.set_row_data(row_indx, self.schedule_data[0], received_data[0].get('languages_list'))
+                            self.resizeRowToContents(row_indx)
+                            self.selectRow(row_indx)
                         else:
-                            self.setRowCount(len(self.schedule_data))
-                            for row_indx, data in enumerate(self.schedule_data):
-                                current_schedule: list = list(filter(lambda d: data[0] == d.get('schedule_id'), self.data_origin))
-                                if len(current_schedule) > 0:
-                                    current_schedule: dict = current_schedule[0]
-                                    self.set_row_data(row_indx, data, current_schedule)
-                                else:
-                                    self.removeRow(0)
-                                self.resizeRowToContents(row_indx)
-                info_message = "Данные обновлены"
-                self.speaker_status_bar.setStatusBarText(text=info_message)
-                self.set_active_row()
+                            if (len(self.schedule_data) == 0):
+                                self.schedule_data = [(None,) * len(self.header)]
+                                self.setRowCount(0)
+                            else:
+                                self.setRowCount(len(self.schedule_data))
+                                for row_indx, data in enumerate(self.schedule_data):
+                                    current_schedule: list = list(filter(lambda d: data[0] == d.get('schedule_id'), self.data_origin))
+                                    if len(current_schedule) > 0:
+                                        current_schedule: dict = current_schedule[0]
+                                        self.set_row_data(row_indx, data, current_schedule.get('languages_list'))
+                                    else:
+                                        self.removeRow(0)
+                                    self.resizeRowToContents(row_indx)
+                    info_message = "Данные обновлены"
+                    self.speaker_status_bar.setStatusBarText(text=info_message)
+                    self.set_active_row()
 
-            case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
-                error_message = f"Данные не обновлены. Ошибка подключения к API: {result.errorString()}"
-                self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
+                case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
+                    error_message = f"Данные не обновлены. Ошибка подключения к API: {result.errorString()}"
+                    self.speaker_status_bar.setStatusBarText(text=error_message, is_error=True)
+        finally:
+            self.setUpdatesEnabled(True)
+            self.blockSignals(False)
         
         self.timer.start()
         if settings.autoplay == 1:
             self.autoplay_timer.start()
 
-    def set_row_data(self, row_indx: int, data: dict, current_schedule: dict):
+    def set_row_data(self, row_indx: int, data: dict, languages: list) -> None:
         for col_indx, item in enumerate(data):
             if col_indx in [1]:
                 is_played, job_time, job_is_fact = item
@@ -240,7 +246,7 @@ class ScheduleTable(QTableWidget):
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 if item:
                     checkbox = TableCheckbox(row_indx, col_indx)
-                    checkbox.setChecked(col_indx-7 in current_schedule.get('languages_list'))
+                    checkbox.setChecked(col_indx-7 in languages)
                     checkbox.checkStateChanged.connect(self.on_widget_state_change)
                     layoutH.addWidget(checkbox)
                 self.setCellWidget(row_indx, col_indx, widget)

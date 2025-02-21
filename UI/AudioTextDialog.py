@@ -14,7 +14,7 @@ from .SpeakerButton import SpeakerButton
 class AudioTextDialog(QDialog):
     append_signal: Signal = Signal(tuple)
 
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         super().__init__(parent)
 
         self.setWindowTitle("Добавление объявлений")
@@ -128,7 +128,7 @@ class AudioTextDialog(QDialog):
         self.API_manager.get(request)
         self.API_manager.finished.connect(self.refresh_flight_list)
 
-    def refresh_flight_list(self, result: QtNetwork.QNetworkReply):
+    def refresh_flight_list(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
@@ -156,7 +156,7 @@ class AudioTextDialog(QDialog):
         self.API_audio_text_manager.get(request)
         self.API_audio_text_manager.finished.connect(self.refresh_audio_text_table)
 
-    def refresh_audio_text_table(self, result: QtNetwork.QNetworkReply):
+    def refresh_audio_text_table(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 self.audio_text_data = []
@@ -194,7 +194,7 @@ class AudioTextDialog(QDialog):
         self.API_audio_text_reason_manager.get(request)
         self.API_audio_text_reason_manager.finished.connect(self.refresh_audio_text_reasons_list)
 
-    def refresh_audio_text_reasons_list(self, result: QtNetwork.QNetworkReply):
+    def refresh_audio_text_reasons_list(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
@@ -221,7 +221,7 @@ class AudioTextDialog(QDialog):
         self.terminal_manager.get(request)
         self.terminal_manager.finished.connect(self.refresh_terminal_list)
 
-    def refresh_terminal_list(self, result: QtNetwork.QNetworkReply):
+    def refresh_terminal_list(self, result: QtNetwork.QNetworkReply) -> None:
         match result.error():
             case QtNetwork.QNetworkReply.NetworkError.NoError:
                 bytes_string = result.readAll()
@@ -242,7 +242,7 @@ class AudioTextDialog(QDialog):
                 logger.error(error_message)
 
     @Slot(int)
-    def display_flight_info(self, row):
+    def display_flight_info(self, row) -> None:
         flight: QStandardItem = self.flight_combobox_model.item(row)
         direction_id: int = flight.data().get('direction_id')
         current_data: list = list(filter(self.get_filtered_audio_text, self.audio_text_data_origin))
@@ -274,7 +274,7 @@ class AudioTextDialog(QDialog):
         current_data: dict = list(filter(lambda d: d.get('id') == row_id, self.audio_text_data_origin))[0]
         return current_data
 
-    def display_audio_text_info(self):
+    def display_audio_text_info(self) -> None:
         current_data: dict = self.get_current_audio_text()
         self.audio_text_info_layout.itemAt(0).widget().setText(current_data.get('annotation'))
         if current_data.get('is_has_reason'):
@@ -375,5 +375,5 @@ class AudioTextDialog(QDialog):
                 reply = (500, error_message, self.body)
         self.append_signal.emit(reply)
     
-    def closeEvent(self, event):
+    def closeEvent(self, event) -> None:
         self.append_signal.emit(None)

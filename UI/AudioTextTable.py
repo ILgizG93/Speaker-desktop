@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QTableView, QHeaderView, QAbstractItemView
 from .TableModel import TableModel
 
 class AudioTextTable(QTableView):
-    def __init__(self, header, parent=None):
+    def __init__(self, header, parent=None) -> None:
         super().__init__(parent)
         
         self.header = header

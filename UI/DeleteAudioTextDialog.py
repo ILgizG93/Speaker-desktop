@@ -3,16 +3,15 @@ from PySide6.QtCore import Qt, QUrl, QUrlQuery, QJsonDocument, Signal
 from PySide6.QtGui import QIcon
 from PySide6 import QtNetwork
 
-from globals import settings, logger
+from globals import settings
 from .Font import RobotoFont
 from .SpeakerButton import SpeakerButton
 
 class DeleteAudioTextDialog(QDialog):
     delete_all_audio: bool = None
     delete_signal: Signal = Signal(QtNetwork.QNetworkReply)
-    data: dict = None
     
-    def __init__(self, parent):
+    def __init__(self, parent) -> None:
         super().__init__(parent)
 
         self.setWindowTitle("Удаление объявлений")
@@ -49,7 +48,7 @@ class DeleteAudioTextDialog(QDialog):
     def set_message_text(self, flight: dict) -> None:
         self.message_label.setText(f"""Рейс {flight.get('flight_number_full')}.\n\nУдалить объявление "{flight.get('audio_text')}" из расписания?""")
 
-    def delete_audio_text(self):
+    def delete_audio_text(self) -> None:
         self.delete_all_audio: bool = self.delete_flight_checkbox.checkState() == Qt.CheckState.Checked
         self.delete_audio_from_schedule()
 
@@ -73,5 +72,5 @@ class DeleteAudioTextDialog(QDialog):
         self.API_post.post(request, QJsonDocument().toJson())
         self.API_post.finished.connect(self.delete_signal.emit)
     
-    def closeEvent(self, event):
+    def closeEvent(self, event) -> None:
         self.delete_signal.emit(None)

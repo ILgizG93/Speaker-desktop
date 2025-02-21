@@ -6,7 +6,7 @@ from .SpeakerButton import SpeakerButton
 from .Font import RobotoFont
 
 class MessageDialog(QDialog):
-    def __init__(self, parent, message):
+    def __init__(self, parent, message) -> None:
         super().__init__(parent)
 
         self.setWindowTitle("Системное сообщение")

@@ -19,8 +19,8 @@ from PySide6 import QtNetwork
 from globals import settings, interface, logger, exit_program_bcs_err
 from .Font import RobotoFont
 from .ScheduleTable import ScheduleTable
-from .PlayerButtonLayout import PlayerButtonLayout
 from .BackgroundTable import BackgroundTable
+from .PlayerButtonLayout import PlayerButtonLayout
 from .AudioTextDialog import AudioTextDialog
 from .DeleteAudioTextDialog import DeleteAudioTextDialog
 from .DeleteBackgroundDialog import DeleteBackgroundDialog
@@ -31,26 +31,26 @@ class LineEdit(QLineEdit):
     enter_pressed_signal: Signal = Signal()
     empty_text_signal: Signal = Signal()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) -> None:
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.enter_pressed_signal.emit()
             return
         super().keyPressEvent(event)
 
 class SpeakerException(Exception):
-    def __init__(self, message, extra_info):
+    def __init__(self, message, extra_info) -> None:
         super().__init__(message)
         self.extra_info = extra_info
 
 class SpeakerApplication(QMainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.user_uuid = 'e8c1c5d1-dfa5-4252-ad97-5d3d222794e1'
 
         font = RobotoFont()
 
         logger.info(f'Начало загрузки формы приложения')
-
+        
         try:
             zones_request = requests.get(settings.api_url+'get_zones')
         except requests.exceptions.ConnectionError as err:
@@ -212,7 +212,7 @@ class SpeakerApplication(QMainWindow):
 
         self.schedule_table.setFocus()
     
-    def set_autoplay(self):
+    def set_autoplay(self) -> None:
         self.schedule_table.autoplay_timer.stop()
         if self.sender().checkState() == Qt.CheckState.Checked:
             settings.autoplay = 1
@@ -232,7 +232,7 @@ class SpeakerApplication(QMainWindow):
             self.schedule_button_layout.btn_sound_play.setEnabled(True)
             self.background_button_layout.btn_sound_play.setEnabled(True)
 
-    def start_flight_searching(self):
+    def start_flight_searching(self) -> None:
         flight_number: str = self.flight_number_filter.text()
         self.flight_number_search_btn.setHidden(True)
         self.flight_number_search_cancel_btn.setVisible(True)
@@ -251,7 +251,7 @@ class SpeakerApplication(QMainWindow):
             return
         self.schedule_table.setFocus()
 
-    def stop_flight_searching(self):
+    def stop_flight_searching(self) -> None:
         self.flight_number_filter.setText('')
         self.flight_number_search_btn.setVisible(True)
         self.flight_number_search_cancel_btn.setHidden(True)
@@ -393,7 +393,6 @@ class SpeakerApplication(QMainWindow):
         if table.autoplay_timer:
             table.autoplay_timer.stop()
         table.current_data = table.get_current_row_data(row_id)
-        self.delete_audio_text_dialog.data = table.data_origin
         self.delete_audio_text_dialog.set_message_text(table.current_data)
         self.delete_audio_text_dialog.set_data(table.current_data)
         self.delete_audio_text_dialog.delete_signal.connect(lambda data: self.after_delete_audio_from_table(table, data))

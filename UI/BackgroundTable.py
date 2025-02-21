@@ -182,7 +182,7 @@ class BackgroundTable(QTableWidget):
                 self.current_data = self.data_origin[0]
             self.selectRow(0)
 
-    async def get_audio_file(self):
+    async def get_audio_file(self) -> None:
         row_id = self.get_current_row_id()
         if row_id is None:
             error_message: str = "Ошибка воспроизведения: Необходимо выбрать объявление"
