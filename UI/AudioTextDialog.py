@@ -1,6 +1,6 @@
 import json
 
-from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox, QTimeEdit, QLineEdit
+from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QDialog, QComboBox, QGroupBox, QTimeEdit, QLineEdit, QScrollArea
 from PySide6.QtCore import Qt, Slot, QUrl, QJsonDocument, Signal, QTime
 from PySide6.QtGui import QIcon, QStandardItemModel, QStandardItem, QIntValidator
 from PySide6 import QtNetwork
@@ -51,6 +51,11 @@ class AudioTextDialog(QDialog):
         self.event_time = QTimeEdit()
         self.event_time.setTime(QTime.currentTime())
 
+        self.aerodrome_combobox_model = QStandardItemModel()
+        self.aerodrome_combobox = QComboBox()
+        self.aerodrome_combobox.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.aerodrome_combobox.setModel(self.aerodrome_combobox_model)
+
         self.audio_text_header = ('', 'Текст объявления', 'Зоны по умолчанию', 'Описание')
         self.audio_text_table = AudioTextTable(header=self.audio_text_header)
         self.audio_text_table.selectionModel().selectionChanged.connect(self.display_audio_text_info)
@@ -63,6 +68,7 @@ class AudioTextDialog(QDialog):
         self.terminal_combobox.setFont(font.get_font())
         self.boarding_gate.setFont(font.get_font())
         self.event_time.setFont(font.get_font())
+        self.aerodrome_combobox.setFont(font.get_font())
         self.audio_text_table.setFont(font.get_font())
 
         self.flight_info_layout = QVBoxLayout()
@@ -85,13 +91,17 @@ class AudioTextDialog(QDialog):
         label = QLabel()
         label.setWordWrap(True)
         label.setFont(font.get_font())
-        label.setFixedWidth(320)
+        label.setFixedWidth(300)
         label.setAlignment(Qt.AlignmentFlag.AlignJustify)
+        scroll_area = QScrollArea()
+        scroll_area.setFixedWidth(330)
+        scroll_area.setWidget(label)
+        scroll_area.setWidgetResizable(True)
         self.audio_text_groupbox = QGroupBox()
         self.audio_text_groupbox.setTitle('Аннотация')
-        self.audio_text_info_layout.addWidget(label)
+        self.audio_text_groupbox.setFixedSize(350, 300)
+        self.audio_text_info_layout.addWidget(scroll_area)
         self.audio_text_groupbox.setLayout(self.audio_text_info_layout)
-        self.audio_text_groupbox.setFixedHeight(300)
 
         self.additional_layout = QVBoxLayout()
         self.additional_groupbox = QGroupBox()
@@ -101,6 +111,7 @@ class AudioTextDialog(QDialog):
         self.additional_layout.addWidget(self.terminal_combobox)
         self.additional_layout.addWidget(self.boarding_gate)
         self.additional_layout.addWidget(self.event_time)
+        self.additional_layout.addWidget(self.aerodrome_combobox)
         self.additional_groupbox.setLayout(self.additional_layout)
         self.additional_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
@@ -241,6 +252,33 @@ class AudioTextDialog(QDialog):
                 self.open_message_dialog(error_message)
                 logger.error(error_message)
 
+    async def get_aerodrome_from_API(self) -> None:
+        url_file = QUrl(settings.api_url+'get_aerodromes')
+        request = QtNetwork.QNetworkRequest(url_file)
+        self.aerodrome_manager = QtNetwork.QNetworkAccessManager()
+        self.aerodrome_manager.get(request)
+        self.aerodrome_manager.finished.connect(self.refresh_aerodrome_list)
+
+    def refresh_aerodrome_list(self, result: QtNetwork.QNetworkReply) -> None:
+        match result.error():
+            case QtNetwork.QNetworkReply.NetworkError.NoError:
+                bytes_string = result.readAll()
+                self.aerodrome_data_origin = json.loads(str(bytes_string, 'utf-8'))
+                item = QStandardItem("Выберите аэродром")
+                self.aerodrome_combobox_model.appendRow(item)
+                for terminal in self.aerodrome_data_origin:
+                    terminal: dict
+                    item = QStandardItem(f"{terminal.get('name')}")
+                    item.setData(terminal)
+                    self.aerodrome_combobox_model.appendRow(item)
+                self.aerodrome_combobox_model.item(0).setEnabled(False)
+                logger.info('Данные аэродромов получены')
+
+            case QtNetwork.QNetworkReply.NetworkError.ConnectionRefusedError:
+                error_message = f"Данные аэродромов не получены. Ошибка подключения к API: {result.errorString()}"
+                self.open_message_dialog(error_message)
+                logger.error(error_message)
+
     @Slot(int)
     def display_flight_info(self, row) -> None:
         flight: QStandardItem = self.flight_combobox_model.item(row)
@@ -276,7 +314,7 @@ class AudioTextDialog(QDialog):
 
     def display_audio_text_info(self) -> None:
         current_data: dict = self.get_current_audio_text()
-        self.audio_text_info_layout.itemAt(0).widget().setText(current_data.get('annotation'))
+        self.audio_text_info_layout.itemAt(0).widget().widget().setText(current_data.get('annotation'))
         if current_data.get('is_has_reason'):
             self.audio_text_reason_combobox.setVisible(True)
         else:
@@ -293,6 +331,10 @@ class AudioTextDialog(QDialog):
             self.event_time.setVisible(True)
         else:
             self.event_time.setHidden(True)
+        if current_data.get('is_has_aerodrome'):
+            self.aerodrome_combobox.setVisible(True)
+        else:
+            self.aerodrome_combobox.setHidden(True)
 
     def open_message_dialog(self, message: str) -> None:
         self.message_dialog: MessageDialog = MessageDialog(self, message)
@@ -302,6 +344,7 @@ class AudioTextDialog(QDialog):
         reason_id: int = None
         terminal: str = None
         event_time: str = None
+        aerodrome_id: int = None
         boarding_gate: str = None
         current_data: dict = self.get_current_audio_text()
 
@@ -340,6 +383,17 @@ class AudioTextDialog(QDialog):
 
         if current_data.get('is_has_event_time'):
             event_time: str = self.event_time.text()
+
+        if current_data.get('is_has_aerodrome'):
+            aerodrome_indx: int = self.aerodrome_combobox.currentIndex()
+            aerodrome_item: QStandardItem = self.aerodrome_combobox_model.item(aerodrome_indx)
+            aerodrome_data: dict = aerodrome_item.data()
+            if aerodrome_data is None:
+                error_message: str = f"Ошибка добавления объявления: Необходимо выбрать аэродром"
+                logger.error(error_message)
+                self.open_message_dialog(error_message)
+                return
+            aerodrome_id = aerodrome_data.get('id')
         
         url_file = QUrl(settings.api_url+'append_audio_text_to_schedule')
         self.body = {
@@ -349,6 +403,7 @@ class AudioTextDialog(QDialog):
             'terminal': terminal,
             'boarding_gates': boarding_gate,
             'event_time': event_time,
+            'aerodrome_id': aerodrome_id,
             'autoplay_is_canceled': True
         }
         request = QtNetwork.QNetworkRequest(url_file)

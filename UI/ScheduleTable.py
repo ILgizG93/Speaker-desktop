@@ -3,8 +3,8 @@ import asyncio
 from datetime import datetime
 
 from typing import Optional
-from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox, QLabel
-from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent
+from PySide6.QtWidgets import QTableWidget, QHeaderView, QAbstractItemView, QWidget, QCheckBox, QHBoxLayout, QTextEdit, QComboBox, QLabel, QTimeEdit
+from PySide6.QtCore import Qt, QUrl, QTimer, QUrl, QUrlQuery, QJsonDocument, Signal, QEvent, QTime
 from PySide6.QtGui import QStandardItem, QStandardItemModel, QWheelEvent, QKeyEvent
 from PySide6 import QtNetwork
 
@@ -12,14 +12,34 @@ from globals import root_directory, settings, logger, TableCheckbox
 from .Font import RobotoFont
 
 class ComboBox(QComboBox):
-    def wheelEvent(self, event: QWheelEvent):
+    def wheelEvent(self, event: QWheelEvent) -> None:
         if event.type() == QEvent.Type.Wheel:
             event.ignore()
 
 class TextEdit(QTextEdit):
     enter_pressed_signal: Signal = Signal()
 
-    def keyPressEvent(self, event: QKeyEvent):
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self.enter_pressed_signal.emit()
+            return
+        super().keyPressEvent(event)
+
+class TimeEdit(QTimeEdit):
+    enter_pressed_signal: Signal = Signal()
+    
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self.setFixedWidth(65)
+        self.setStyleSheet("""
+            TimeEdit {
+                font-size: 14px;
+                min-height: 28px;
+                max-height: 28px;
+            }
+        """)
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             self.enter_pressed_signal.emit()
             return
@@ -67,7 +87,7 @@ class ScheduleTable(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(12, QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnWidth(1, 50)
         self.setColumnWidth(4, 50)
-        self.setColumnWidth(5, 50)
+        self.setColumnWidth(5, 80)
         self.setColumnWidth(7, 240)
         self.setColumnWidth(8, 32)
         self.setColumnWidth(9, 32)
@@ -143,14 +163,16 @@ class ScheduleTable(QTableWidget):
                             else:
                                 audio_text = f"{data.get('audio_text')}"
                             if data.get('event_time'):
-                                audio_text += f" ({data.get('event_time')})"
+                                public_flight_time = (True, data.get('event_time'))
+                            else:
+                                public_flight_time = (False, data.get('public_flight_time'))
                             self.schedule_data.append((
                                 data.get('schedule_id'), 
                                 (data.get('is_played'), data.get('job_time'), data.get('job_is_fact')), 
                                 data.get('flight_number_full'), 
                                 data.get('direction'), 
                                 data.get('plan_flight_time'), 
-                                data.get('public_flight_time'), 
+                                public_flight_time, 
                                 audio_text, 
                                 data.get('path'),
                                 data.get('languages').get('RUS').get('display'), 
@@ -207,7 +229,7 @@ class ScheduleTable(QTableWidget):
 
     def set_row_data(self, row_indx: int, data: dict, languages: list) -> None:
         for col_indx, item in enumerate(data):
-            if col_indx in [1]:
+            if col_indx in [1]: # Время выполнения задачи (регистрация, посадка и тд)
                 is_played, job_time, job_is_fact = item
                 element = QLabel(job_time)
                 element.setFont(self.font.get_font())
@@ -219,28 +241,42 @@ class ScheduleTable(QTableWidget):
                     'QWidget { border-top: 1px 0px solid white; text-align: center; border-radius: 0px; background-color: rgb(92, 184, 92); '+job_fact_style+' }  QWidget::disabled { color: rgb(174, 175, 178) }', 
                     'QWidget { border-top: 1px 0px solid white; text-align: center; border-radius: 0px; background-color: rgb(250, 250, 250); '+job_fact_style+' }  QWidget::disabled { color: rgb(174, 175, 178) }'
                 )[is_played is None])
-            elif col_indx in [2]:
+            elif col_indx in [2]:   # Номер рейса
                 element = QLabel(item)
                 element.setFont(self.font.get_font())
                 self.setCellWidget(row_indx, col_indx, element)
                 if data[-1][1] == 10:
                     cell = self.cellWidget(row_indx, col_indx)
                     cell.setStyleSheet('QWidget { color: rgb(255, 25, 25); } QWidget::disabled { color: rgb(174, 175, 178) }')
-            elif col_indx in [3,4]:
+            elif col_indx in [3,4]: # Направление, Вр рейса (план)
                 element = QLabel(item)
                 element.setFont(self.font.get_font())
                 element.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 self.setCellWidget(row_indx, col_indx, element)
-            elif col_indx in [i for i in range(13, 12+len(self.zones)+1)]:
-                widget = QWidget()
-                checkbox = TableCheckbox(row_indx, col_indx)
-                checkbox.setChecked(item)
-                checkbox.checkStateChanged.connect(self.on_widget_state_change)
-                layoutH = QHBoxLayout(widget)
-                layoutH.addWidget(checkbox)
-                layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [8,9,10]:
+            elif col_indx in [5]: # Направление, Вр рейса (план)
+                is_delayed, event_time = item
+                if is_delayed:
+                    event_time = list(map(int, event_time.split(':')))
+                    event_time = QTime(event_time[0], event_time[1])
+                    widget = QWidget()
+                    layoutH = QHBoxLayout(widget)
+                    layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    event_time_edit = TimeEdit()
+                    event_time_edit.setObjectName(f'{row_indx}_{col_indx}')
+                    event_time_edit.setFont(self.font.get_font(12))
+                    event_time_edit.setTime(event_time)
+                    event_time_edit.enter_pressed_signal.connect(self.on_widget_state_change)
+                    event_time_edit.timeChanged.connect(self.select_current_row)
+                    layoutH.addWidget(event_time_edit)
+                    self.setCellWidget(row_indx, col_indx, widget)
+                else:
+                    element = QLabel(event_time)
+                    element.setFont(self.font.get_font())
+                    element.setWordWrap(True)
+                    element.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                    element.setStyleSheet('QWidget { color: rgb(255, 25, 25) } QWidget::disabled { color: rgb(174, 175, 178) } ')
+                    self.setCellWidget(row_indx, col_indx, element)
+            elif col_indx in [8,9,10]:  # Языки
                 widget = QWidget()
                 layoutH = QHBoxLayout(widget)
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -250,7 +286,7 @@ class ScheduleTable(QTableWidget):
                     checkbox.checkStateChanged.connect(self.on_widget_state_change)
                     layoutH.addWidget(checkbox)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [11]:
+            elif col_indx in [11]:  # Терминал
                 widget = QWidget()
                 layoutH = QHBoxLayout(widget)
                 layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -273,7 +309,7 @@ class ScheduleTable(QTableWidget):
                 combobox.currentIndexChanged[int].connect(self.on_widget_state_change)
                 layoutH.addWidget(combobox)
                 self.setCellWidget(row_indx, col_indx, widget)
-            elif col_indx in [12]:
+            elif col_indx in [12]:  # Номер выхода
                 widget = QWidget()
                 if data[-1][0] == 1:
                     layoutH = QHBoxLayout(widget)
@@ -288,9 +324,18 @@ class ScheduleTable(QTableWidget):
                     text_edit.selectionChanged.connect(self.select_current_row)
                     layoutH.addWidget(text_edit)
                 self.setCellWidget(row_indx, col_indx, widget)
+            elif col_indx in [i for i in range(13, 12+len(self.zones)+1)]:  # Зоны
+                widget = QWidget()
+                checkbox = TableCheckbox(row_indx, col_indx)
+                checkbox.setChecked(item)
+                checkbox.checkStateChanged.connect(self.on_widget_state_change)
+                layoutH = QHBoxLayout(widget)
+                layoutH.addWidget(checkbox)
+                layoutH.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.setCellWidget(row_indx, col_indx, widget)
             elif col_indx >= len(self.header)-1:
                 ...
-            else:
+            else:   # Остальные колонки
                 element = QLabel(item)
                 element.setFont(self.font.get_font())
                 element.setWordWrap(True)
@@ -328,6 +373,11 @@ class ScheduleTable(QTableWidget):
             if checkbox.checkState() == Qt.CheckState.Checked:
                 current_zones.append(i-12)
         return current_zones
+
+    def get_current_event_time(self) -> Optional[str]:
+        row: int = self.currentRow()
+        if time_edit := self.cellWidget(row,5).findChild(TimeEdit):
+            return time_edit.time().toString("HH:mm")
 
     def get_current_terminal(self) -> str:
         row: int = self.currentRow()
@@ -440,6 +490,7 @@ class ScheduleTable(QTableWidget):
             'zones': self.get_current_zones(),
             'terminal': self.get_current_terminal(),
             'boarding_gates': self.get_current_boarding_gates(),
+            'event_time': self.get_current_event_time(),
             'is_deleted': is_deleted
         })
         self.API_post.post(request, body.toJson())

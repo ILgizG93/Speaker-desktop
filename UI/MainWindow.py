@@ -360,7 +360,8 @@ class SpeakerApplication(QMainWindow):
         asyncio.run(self.audio_text_dialog.get_audio_text_from_API())
         asyncio.run(self.audio_text_dialog.get_audio_text_reasons_from_API())
         asyncio.run(self.audio_text_dialog.get_terminal_from_API())
-        self.audio_text_dialog.audio_text_info_layout.itemAt(0).widget().setText('')
+        asyncio.run(self.audio_text_dialog.get_aerodrome_from_API())
+        self.audio_text_dialog.audio_text_info_layout.itemAt(0).widget().widget().setText('')
         self.audio_text_dialog.append_signal.connect(self.schedule_table_after_append)
         self.audio_text_dialog.exec()
 
