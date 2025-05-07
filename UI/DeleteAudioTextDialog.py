@@ -8,6 +8,7 @@ from .Font import RobotoFont
 from .SpeakerButton import SpeakerButton
 
 class DeleteAudioTextDialog(QDialog):
+    data: list[dict] = None
     delete_all_audio: bool = None
     delete_signal: Signal = Signal(QtNetwork.QNetworkReply)
     

@@ -30,7 +30,7 @@ class TimeEdit(QTimeEdit):
     
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        self.setFixedWidth(65)
+        self.setFixedWidth(70)
         self.setStyleSheet("""
             TimeEdit {
                 font-size: 14px;
@@ -86,8 +86,8 @@ class ScheduleTable(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(11, QHeaderView.ResizeMode.ResizeToContents)
         self.horizontalHeader().setSectionResizeMode(12, QHeaderView.ResizeMode.ResizeToContents)
         self.setColumnWidth(1, 50)
-        self.setColumnWidth(4, 50)
-        self.setColumnWidth(5, 80)
+        self.setColumnWidth(4, 72)
+        self.setColumnWidth(5, 90)
         self.setColumnWidth(7, 240)
         self.setColumnWidth(8, 32)
         self.setColumnWidth(9, 32)

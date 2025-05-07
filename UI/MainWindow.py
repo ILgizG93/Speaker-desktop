@@ -394,6 +394,7 @@ class SpeakerApplication(QMainWindow):
         if table.autoplay_timer:
             table.autoplay_timer.stop()
         table.current_data = table.get_current_row_data(row_id)
+        self.delete_audio_text_dialog.data = table.data_origin
         self.delete_audio_text_dialog.set_message_text(table.current_data)
         self.delete_audio_text_dialog.set_data(table.current_data)
         self.delete_audio_text_dialog.delete_signal.connect(lambda data: self.after_delete_audio_from_table(table, data))
